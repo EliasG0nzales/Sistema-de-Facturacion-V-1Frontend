@@ -28,3 +28,5 @@ export const useAuth = () => {
   if (!ctx) throw new Error("useAuth debe usarse dentro de AuthProvider");
   return ctx;
 };
+
+//ola es un comentario
