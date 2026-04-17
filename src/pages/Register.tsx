@@ -3,7 +3,7 @@ import type { FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 const BG_URL =
-  "https://meusetup.com/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBc1lCIiwiZXhwIjpudWxsLCJwdXIiOiJibG9iX2lkIn19--e3bd8690eec4098ef2cd9684d5a1f5733a92e47a/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdDVG9MWm05eWJXRjBTU0lJYW5CbkJqb0dSVlE2RkhKbGMybDZaVjkwYjE5c2FXMXBkRnNIYVFLRUEya0NoQU02REdkeVlYWnBkSGxKSWc1VGIzVjBhRVZoYzNRR093WlVPZ2xrY21GM1NTSkRhVzFoWjJVZ1QzWmxjaUF3TERBZ01Dd3dJQ0l2WVhCd0wyeHBZaTloYzNObGRITXZhVzFoWjJWekwzQmhhV1F0ZDJGMFpYSnRZWEpyTG5CdVp5SUdPd1pVIiwiZXhwIjpudWxsLCJwdXIiOiJ2YXJpYXRpb24ifX0=--6fe9d9127ca19da894c96e3af1b288c8b1c292b6/0303.jpg";
+  "https://www.caseking.de/blog/wp-content/uploads/2025/08/AD_4nXd2eRvsZII7ieRqFrh7gm0zG9FdUyFye60kZNNvrEA8dmqkFQ8Ad_0Vo53dKuw9kcodhQMw1LXfEyvlTbiMjnv_0y9Gqac9t07f1z682I3d0afx9ydXKJ276w37rbnhypHs3OO2-Q.jpg";
 
 interface RegisterForm {
   companyName: string;
@@ -12,6 +12,8 @@ interface RegisterForm {
   address: string;
   province: string;
   district: string;
+  password: string;
+  confirmPassword: string;
   acceptTerms: boolean;
 }
 
@@ -36,6 +38,7 @@ const labelStyle: React.CSSProperties = {
 
 const Register = () => {
   const navigate = useNavigate();
+
   const [form, setForm] = useState<RegisterForm>({
     companyName: "",
     phone: "",
@@ -43,13 +46,17 @@ const Register = () => {
     address: "",
     province: "",
     district: "",
+    password: "",
+    confirmPassword: "",
     acceptTerms: false,
   });
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
+
     setForm((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -60,27 +67,63 @@ const Register = () => {
     e.preventDefault();
     setError("");
 
-    if (!form.companyName || !form.phone || !form.email || !form.address) {
+    if (
+      !form.companyName ||
+      !form.phone ||
+      !form.email ||
+      !form.address ||
+      !form.password ||
+      !form.confirmPassword
+    ) {
       setError("Por favor completa todos los campos obligatorios.");
       return;
     }
+
+    if (form.password.length < 4) {
+      setError("La contraseña debe tener al menos 4 caracteres.");
+      return;
+    }
+
+    if (form.password !== form.confirmPassword) {
+      setError("Las contraseñas no coinciden.");
+      return;
+    }
+
     if (!form.acceptTerms) {
       setError("Debes aceptar los términos y condiciones.");
       return;
     }
 
-    // Guardar usuario en localStorage (simulación)
     const users = JSON.parse(localStorage.getItem("eagle_users") || "[]");
-    const exists = users.find((u: { email: string }) => u.email === form.email);
+
+    const exists = users.find(
+      (u: { email: string }) => u.email.toLowerCase() === form.email.toLowerCase()
+    );
+
     if (exists) {
       setError("Este correo ya está registrado.");
       return;
     }
-    users.push({ ...form, password: "1234" }); // contraseña por defecto o puedes agregar campo
+
+    const newUser = {
+      companyName: form.companyName,
+      phone: form.phone,
+      email: form.email,
+      address: form.address,
+      province: form.province,
+      district: form.district,
+      password: form.password,
+      acceptTerms: form.acceptTerms,
+    };
+
+    users.push(newUser);
     localStorage.setItem("eagle_users", JSON.stringify(users));
 
     setSuccess(true);
-    setTimeout(() => navigate("/"), 2000);
+
+    setTimeout(() => {
+      navigate("/");
+    }, 1500);
   };
 
   return (
@@ -88,12 +131,13 @@ const Register = () => {
       style={{
         display: "flex",
         height: "100vh",
+        width: "100%",
         backgroundImage: `url('${BG_URL}')`,
         backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
       }}
     >
-      {/* Panel izquierdo */}
       <div
         style={{
           flex: 1,
@@ -102,6 +146,7 @@ const Register = () => {
           justifyContent: "center",
           padding: "0 60px",
           color: "#fff",
+          background: "rgba(0,0,0,0.25)",
         }}
       >
         <h1
@@ -109,30 +154,28 @@ const Register = () => {
             fontSize: 48,
             fontWeight: 700,
             marginBottom: 16,
-            lineHeight: 1.4,
-            textAlign: "left", 
-            textShadow: "none", 
+            lineHeight: 1.2,
+            textAlign: "left",
           }}
-    
         >
           Bienvenido
-          <br />a EAGLE GAMING
+          <br />
+          a EAGLE GAMING
         </h1>
+
         <p
           style={{
             fontSize: 14,
             maxWidth: 380,
-            opacity: 0.85,
+            opacity: 0.9,
             lineHeight: 1.6,
           }}
         >
-          Es un hecho bien establecido que un lector se distraerá con el
-          contenido legible de una página al observar su diseño. El objetivo de
-          usar esto es...
+          Crea tu cuenta para acceder a la plataforma y administrar tu panel de
+          control.
         </p>
       </div>
 
-      {/* Panel derecho - formulario */}
       <div
         style={{
           width: 440,
@@ -180,7 +223,7 @@ const Register = () => {
                 textAlign: "center",
               }}
             >
-              ¡Cuenta creada exitosamente! Redirigiendo...
+              ¡Cuenta creada exitosamente! Redirigiendo al login...
             </p>
           )}
 
@@ -205,7 +248,7 @@ const Register = () => {
               <input
                 type="tel"
                 name="phone"
-                placeholder="lauret"
+                placeholder="987654321"
                 value={form.phone}
                 onChange={handleChange}
                 style={inputStyle}
@@ -217,7 +260,7 @@ const Register = () => {
               <input
                 type="email"
                 name="email"
-                placeholder="lauret"
+                placeholder="correo@empresa.com"
                 value={form.email}
                 onChange={handleChange}
                 style={inputStyle}
@@ -253,6 +296,30 @@ const Register = () => {
                 type="text"
                 name="district"
                 value={form.district}
+                onChange={handleChange}
+                style={inputStyle}
+              />
+            </div>
+
+            <div>
+              <label style={labelStyle}>Contraseña *</label>
+              <input
+                type="password"
+                name="password"
+                placeholder="Ingresa tu contraseña"
+                value={form.password}
+                onChange={handleChange}
+                style={inputStyle}
+              />
+            </div>
+
+            <div>
+              <label style={labelStyle}>Confirmar contraseña *</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Repite tu contraseña"
+                value={form.confirmPassword}
                 onChange={handleChange}
                 style={inputStyle}
               />

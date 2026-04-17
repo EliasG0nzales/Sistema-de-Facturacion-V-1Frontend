@@ -3,7 +3,7 @@ import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 
 const BG_URL =
-  "https://meusetup.com/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBBc1lCIiwiZXhwIjpudWxsLCJwdXIiOiJibG9iX2lkIn19--e3bd8690eec4098ef2cd9684d5a1f5733a92e47a/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdDVG9MWm05eWJXRjBTU0lJYW5CbkJqb0dSVlE2RkhKbGMybDZaVjkwYjE5c2FXMXBkRnNIYVFLRUEya0NoQU02REdkeVlYWnBkSGxKSWc1VGIzVjBhRVZoYzNRR093WlVPZ2xrY21GM1NTSkRhVzFoWjJVZ1QzWmxjaUF3TERBZ01Dd3dJQ0l2WVhCd0wyeHBZaTloYzNObGRITXZhVzFoWjJWekwzQmhhV1F0ZDJGMFpYSnRZWEpyTG5CdVp5SUdPd1pVIiwiZXhwIjpudWxsLCJwdXIiOiJ2YXJpYXRpb24ifX0=--6fe9d9127ca19da894c96e3af1b288c8b1c292b6/0303.jpg";
+  "https://i.blogs.es/14dbd7/oled-pantalla/1200_900.jpeg";
 
 const ForgotPassword = () => {
   const [contact, setContact] = useState("");
