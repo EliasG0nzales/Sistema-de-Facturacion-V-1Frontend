@@ -3,7 +3,7 @@ import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 
 const BG_URL =
-  "https://i.blogs.es/14dbd7/oled-pantalla/1200_900.jpeg";
+  "https://wallpapers.com/images/hd/anime-gamer-room-gg83jijph3tvrzt9.jpg";
 
 const ForgotPassword = () => {
   const [contact, setContact] = useState("");
