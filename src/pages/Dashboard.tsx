@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { ProductosProvider } from "../context/ProductosContext";
 import Vender from "../components/dashboard/Vender";
 import Productos from "../components/dashboard/Productos";
 import Clientes from "../components/dashboard/Clientes";
@@ -27,17 +28,18 @@ const Dashboard = () => {
   };
 
   return (
-    <div style={{ display: "flex", height: "100vh", background: "#e0e0e0" }}>
-      {/* Sidebar */}
-      <aside style={{
-        width: 200,
-        background: "#d0d0d0",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "32px 20px 28px",
-        boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
-      }}>
+    <ProductosProvider>
+      <div style={{ display: "flex", height: "100vh", background: "#e0e0e0" }}>
+        {/* Sidebar */}
+        <aside style={{
+          width: 200,
+          background: "#d0d0d0",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: "32px 20px 28px",
+          boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
+        }}>
         {/* Avatar con animación */}
         <div style={{
           width: 72, height: 72, borderRadius: "50%",
@@ -152,6 +154,7 @@ const Dashboard = () => {
         {renderSection()}
       </main>
     </div>
+    </ProductosProvider>
   );
 };
 

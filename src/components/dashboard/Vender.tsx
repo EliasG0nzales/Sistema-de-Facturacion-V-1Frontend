@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ReactElement } from "react";
 import type { Producto } from "../../types/producto";
 import type { ItemCarrito } from "../../types/carrito";
-import { CATEGORIAS, productosEjemplo } from "../../data/productos";
+import { CATEGORIAS } from "../../data/productos";
+import { useProductos } from "../../context/ProductosContext";
 import Carrito from "./Carrito";
 
 
@@ -82,20 +83,198 @@ const CAT_ICONS: Record<string, ReactElement> = {
   ),
 };
 
+// Componente ProductoCard con rotación de imágenes
+const ProductoCard = ({ producto, imagenes, onAgregar, onVerDetalle }: {
+  producto: Producto;
+  imagenes: string[];
+  onAgregar: () => void;
+  onVerDetalle: () => void;
+}) => {
+  const [imagenActual, setImagenActual] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    if (!isHovered || imagenes.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setImagenActual((prev) => (prev + 1) % imagenes.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [isHovered, imagenes.length]);
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    if (imagenes.length > 1) {
+      setImagenActual(1); // Mostrar primera imagen secundaria
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setImagenActual(0); // Volver a imagen principal
+  };
+
+  return (
+    <div
+      className="vender-card"
+      onClick={onAgregar}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      title="Click para agregar al carrito"
+    >
+      <div className="vender-card-inner">
+        {/* FRENTE */}
+        <div className="vender-card-front">
+          {imagenes.length > 0 ? (
+            <img
+              src={imagenes[imagenActual]}
+              alt={producto.nombre}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                transition: "opacity 0.5s ease",
+              }}
+            />
+          ) : (
+            <div className="vender-card-img-bg">
+              <div className="circle" />
+              <div className="circle circle-bottom" />
+              <div className="circle circle-right" />
+            </div>
+          )}
+          <div className="vender-card-front-content">
+            <span className="vender-card-badge">{producto.categoria}</span>
+            <div className="vender-card-desc">
+              <div className="vender-card-title-row">
+                <span>{producto.nombre}</span>
+              </div>
+              <p className="vender-card-footer-text">
+                Stock: {producto.stock} &nbsp;|&nbsp; S/ {producto.precio.toFixed(2)}
+              </p>
+            </div>
+          </div>
+        </div>
+        {/* DORSO */}
+        <div className="vender-card-back">
+          <div className="vender-card-back-content">
+            <svg stroke="#ffffff" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" height="40px" width="40px" fill="#ffffff">
+              <path d="M20.84375 0.03125C20.191406 0.0703125 19.652344 0.425781 19.21875 1.53125C18.988281 2.117188 18.5 3.558594 18.03125 4.9375C17.792969 5.636719 17.570313 6.273438 17.40625 6.75C17.390625 6.796875 17.414063 6.855469 17.40625 6.90625C17.398438 6.925781 17.351563 6.949219 17.34375 6.96875L17.25 7.25C18.566406 7.65625 19.539063 8.058594 19.625 8.09375C22.597656 9.21875 28.351563 11.847656 33.28125 16.78125C38.5 22 41.183594 28.265625 42.09375 30.71875C42.113281 30.761719 42.375 31.535156 42.75 32.84375C42.757813 32.839844 42.777344 32.847656 42.78125 32.84375C43.34375 32.664063 44.953125 32.09375 46.3125 31.625C47.109375 31.351563 47.808594 31.117188 48.15625 31C49.003906 30.714844 49.542969 30.292969 49.8125 29.6875C50.074219 29.109375 50.066406 28.429688 49.75 27.6875C49.605469 27.347656 49.441406 26.917969 49.25 26.4375C47.878906 23.007813 45.007813 15.882813 39.59375 10.46875C33.613281 4.484375 25.792969 1.210938 22.125 0.21875C21.648438 0.0898438 21.234375 0.0078125 20.84375 0.03125 Z M 16.46875 9.09375L0.0625 48.625C-0.09375 48.996094 -0.00390625 49.433594 0.28125 49.71875C0.472656 49.910156 0.738281 50 1 50C1.128906 50 1.253906 49.988281 1.375 49.9375L40.90625 33.59375C40.523438 32.242188 40.222656 31.449219 40.21875 31.4375C39.351563 29.089844 36.816406 23.128906 31.875 18.1875C27.035156 13.34375 21.167969 10.804688 18.875 9.9375C18.84375 9.925781 17.8125 9.5 16.46875 9.09375 Z M 17 16C19.761719 16 22 18.238281 22 21C22 23.761719 19.761719 26 17 26C15.140625 26 13.550781 24.972656 12.6875 23.46875L15.6875 16.1875C16.101563 16.074219 16.550781 16 17 16 Z M 31 22C32.65625 22 34 23.34375 34 25C34 25.917969 33.585938 26.730469 32.9375 27.28125L32.90625 27.28125C33.570313 27.996094 34 28.949219 34 30C34 32.210938 32.210938 34 30 34C27.789063 34 26 32.210938 26 30C26 28.359375 26.996094 26.960938 28.40625 26.34375L28.3125 26.3125C28.117188 25.917969 28 25.472656 28 25C28 23.34375 29.34375 22 31 22 Z M 21 32C23.210938 32 25 33.789063 25 36C25 36.855469 24.710938 37.660156 24.25 38.3125L20.3125 39.9375C18.429688 39.609375 17 37.976563 17 36C17 33.789063 18.789063 32 21 32 Z M 9 34C10.65625 34 12 35.34375 12 37C12 38.65625 10.65625 40 9 40C7.902344 40 6.960938 39.414063 6.4375 38.53125L8.25 34.09375C8.488281 34.03125 8.742188 34 9 34Z" />
+            </svg>
+            <strong>{producto.nombre}</strong>
+            <span className="vender-card-back-precio">S/ {producto.precio.toFixed(2)}</span>
+            <span className="vender-card-back-stock">{producto.stock} disponibles</span>
+          </div>
+        </div>
+      </div>
+      {/* Lupa fuera del flip para que siempre sea clickeable */}
+      <button
+        className="vender-card-lupa"
+        onClick={(e) => { e.stopPropagation(); onVerDetalle(); }}
+        title="Ver detalles"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1e293b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="7" />
+          <line x1="16.5" y1="16.5" x2="22" y2="22" />
+          <line x1="8" y1="11" x2="14" y2="11" />
+          <line x1="11" y1="8" x2="11" y2="14" />
+        </svg>
+      </button>
+    </div>
+  );
+};
+
 const Vender = () => {
+  const { productos } = useProductos();
   const [busqueda, setBusqueda] = useState("");
   const [categoriaFiltro, setCategoriaFiltro] = useState("todas");
   const [dropdownAbierto, setDropdownAbierto] = useState(false);
+  const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
+  const [filtrosActivos, setFiltrosActivos] = useState<Record<string, string>>({});
   const [carrito, setCarrito] = useState<ItemCarrito[]>([]);
   const [carritoAbierto, setCarritoAbierto] = useState(false);
   const [productoDetalle, setProductoDetalle] = useState<Producto | null>(null);
+  const [imagenActual, setImagenActual] = useState(0);
 
   const totalItems = carrito.reduce((acc, i) => acc + i.cantidad, 0);
 
-  const productosFiltrados = productosEjemplo.filter((p) => {
+  // Función para obtener el nombre comercial de la resolución
+  const obtenerNombreResolucion = (resolucion: string): string => {
+    const resoluciones: Record<string, string> = {
+      "1280x720": "HD",
+      "1920x1080": "Full HD",
+      "2560x1440": "QHD",
+      "3840x2160": "4K UHD",
+      "7680x4320": "8K",
+    };
+    return resoluciones[resolucion] || "";
+  };
+
+  // Función para formatear valores de filtros
+  const formatearValorFiltro = (clave: string, valor: string): string => {
+    if (clave === "resolucion") {
+      const nombre = obtenerNombreResolucion(valor);
+      return nombre ? `${valor} (${nombre})` : valor;
+    }
+    return valor;
+  };
+
+  // Obtener filtros disponibles según la categoría seleccionada
+  const obtenerFiltrosDisponibles = () => {
+    const filtros: Record<string, string[]> = {};
+    
+    const productosCategoria = categoriaFiltro === "todas" 
+      ? productos 
+      : productos.filter(p => p.categoria === categoriaFiltro);
+
+    productosCategoria.forEach(p => {
+      Object.entries(p.especificaciones).forEach(([key, value]) => {
+        if (!filtros[key]) filtros[key] = [];
+        const valorStr = String(value);
+        if (!filtros[key].includes(valorStr)) {
+          filtros[key].push(valorStr);
+        }
+      });
+    });
+
+    return filtros;
+  };
+
+  const filtrosDisponibles = obtenerFiltrosDisponibles();
+
+  const aplicarFiltro = (clave: string, valor: string) => {
+    setFiltrosActivos(prev => {
+      const nuevos = { ...prev };
+      if (nuevos[clave] === valor) {
+        delete nuevos[clave];
+      } else {
+        nuevos[clave] = valor;
+      }
+      return nuevos;
+    });
+  };
+
+  const limpiarFiltros = () => {
+    setFiltrosActivos({});
+  };
+
+  const totalFiltrosActivos = Object.keys(filtrosActivos).length;
+
+  const productosFiltrados = productos.filter((p) => {
     const matchNombre = p.nombre.toLowerCase().includes(busqueda.toLowerCase());
     const matchCat = categoriaFiltro === "todas" || p.categoria === categoriaFiltro;
-    return matchNombre && matchCat && p.stock > 0;
+    const matchStock = p.stock > 0;
+    
+    // Aplicar filtros de especificaciones
+    const matchFiltros = Object.entries(filtrosActivos).every(([clave, valor]) => {
+      return String(p.especificaciones[clave]) === valor;
+    });
+    
+    return matchNombre && matchCat && matchStock && matchFiltros;
   });
 
   const agregarAlCarrito = (producto: Producto) => {
@@ -385,7 +564,7 @@ const Vender = () => {
           background: #fff;
           border-radius: 14px;
           width: 100%;
-          max-width: 560px;
+          max-width: 850px;
           max-height: 90vh;
           overflow-y: auto;
           box-shadow: 0 20px 60px rgba(0,0,0,0.3);
@@ -406,13 +585,13 @@ const Vender = () => {
           color: #1e293b;
         }
         .modal-body {
-          padding: 20px;
+          padding: 24px;
           display: flex;
-          gap: 20px;
+          gap: 28px;
         }
         .modal-img {
-          width: 180px;
-          min-width: 180px;
+          width: 360px;
+          min-width: 360px;
           aspect-ratio: 1/1;
           background: linear-gradient(135deg, #1e1e3a, #2d2d5e);
           border-radius: 10px;
@@ -420,6 +599,53 @@ const Vender = () => {
           align-items: center;
           justify-content: center;
           font-size: 3rem;
+          position: relative;
+          overflow: hidden;
+        }
+        .modal-img img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .carrusel-btn {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          background: rgba(255,255,255,0.9);
+          border: none;
+          border-radius: 50%;
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: background 0.2s;
+          z-index: 10;
+        }
+        .carrusel-btn:hover {
+          background: #fff;
+        }
+        .carrusel-btn-prev { left: 10px; }
+        .carrusel-btn-next { right: 10px; }
+        .carrusel-indicadores {
+          position: absolute;
+          bottom: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          gap: 8px;
+        }
+        .carrusel-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.5);
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+        .carrusel-dot.active {
+          background: #fff;
         }
         .modal-info { flex: 1; }
         .modal-nombre { font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
@@ -432,7 +658,13 @@ const Vender = () => {
           color: #1e293b;
         }
         .modal-precio-box span { color: #2563eb; font-weight: 700; }
-        .modal-desc { font-size: 0.82rem; color: #475569; line-height: 1.55; margin-bottom: 12px; }
+        .modal-desc { 
+          font-size: 0.85rem; 
+          color: #475569; 
+          line-height: 1.65; 
+          margin-bottom: 16px;
+          text-align: justify;
+        }
         .modal-footer {
           padding: 16px 20px;
           border-top: 1px solid #e2e8f0;
@@ -468,6 +700,88 @@ const Vender = () => {
           transition: background 0.2s;
         }
         .btn-cerrar-modal:hover { background: #e2e8f0; }
+        /* Dropdown filtros */
+        .filtros-dropdown {
+          position: absolute;
+          top: calc(100% + 6px);
+          right: 0;
+          background: #fff;
+          border: 1px solid #e2e8f0;
+          border-radius: 10px;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+          z-index: 50;
+          min-width: 280px;
+          max-height: 400px;
+          overflow-y: auto;
+        }
+        .filtros-header {
+          padding: 12px 16px;
+          border-bottom: 1px solid #e2e8f0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-weight: 600;
+          font-size: 0.85rem;
+          color: #1e293b;
+        }
+        .filtros-limpiar {
+          background: none;
+          border: none;
+          color: #ef4444;
+          font-size: 0.75rem;
+          cursor: pointer;
+          font-weight: 600;
+        }
+        .filtros-limpiar:hover {
+          text-decoration: underline;
+        }
+        .filtro-grupo {
+          padding: 12px 16px;
+          border-bottom: 1px solid #f1f5f9;
+        }
+        .filtro-grupo:last-child {
+          border-bottom: none;
+        }
+        .filtro-titulo {
+          font-size: 0.78rem;
+          font-weight: 600;
+          color: #475569;
+          margin-bottom: 8px;
+          text-transform: capitalize;
+        }
+        .filtro-opciones {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+        }
+        .filtro-chip {
+          padding: 4px 10px;
+          border-radius: 16px;
+          border: 1px solid #e2e8f0;
+          background: #fff;
+          font-size: 0.72rem;
+          cursor: pointer;
+          transition: all 0.2s;
+          color: #1e293b;
+        }
+        .filtro-chip:hover {
+          border-color: #e05a7a;
+          background: #fff;
+          color: #1e293b;
+        }
+        .filtro-chip.active {
+          background: #fff;
+          border-color: #e05a7a;
+          color: #1e293b;
+          font-weight: 600;
+          box-shadow: 0 0 0 2px rgba(224, 90, 122, 0.2);
+        }
+        .filtros-vacio {
+          padding: 24px 16px;
+          text-align: center;
+          color: #94a3b8;
+          font-size: 0.8rem;
+        }
       `}</style>
 
       {/* Header */}
@@ -487,9 +801,11 @@ const Vender = () => {
           onChange={(e) => setBusqueda(e.target.value)}
           style={{ flex: 1, padding: "7px 14px", borderRadius: 20, border: "1px solid #bbb", fontSize: 13, outline: "none" }}
         />
+        
+        {/* Botón Categorías */}
         <div style={{ position: "relative" }}>
           <button
-            onClick={() => setDropdownAbierto((v) => !v)}
+            onClick={() => { setDropdownAbierto((v) => !v); setFiltrosAbiertos(false); }}
             style={{
               padding: "7px 14px", borderRadius: 20, border: "1px solid #bbb",
               fontSize: 13, outline: "none", cursor: "pointer",
@@ -513,7 +829,7 @@ const Vender = () => {
               {categorias.map((c) => (
                 <button
                   key={c}
-                  onClick={() => { setCategoriaFiltro(c); setDropdownAbierto(false); }}
+                  onClick={() => { setCategoriaFiltro(c); setDropdownAbierto(false); limpiarFiltros(); }}
                   style={{
                     width: "100%", display: "flex", alignItems: "center", gap: 10,
                     padding: "9px 14px", background: categoriaFiltro === c ? "#fff0f4" : "transparent",
@@ -530,6 +846,73 @@ const Vender = () => {
             </div>
           )}
         </div>
+
+        {/* Botón Filtros */}
+        <div style={{ position: "relative" }}>
+          <button
+            onClick={() => { setFiltrosAbiertos((v) => !v); setDropdownAbierto(false); }}
+            style={{
+              position: "relative",
+              padding: "7px 14px", borderRadius: 20, border: "1px solid #bbb",
+              fontSize: 13, outline: "none", cursor: "pointer",
+              background: "#fff", color: "#333", display: "flex", alignItems: "center", gap: 8,
+            }}
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#e05a7a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+            </svg>
+            Filtros
+            {totalFiltrosActivos > 0 && (
+              <span style={{
+                position: "absolute", top: -6, right: -6,
+                background: "#ef4444", color: "#fff",
+                borderRadius: "50%", width: 18, height: 18,
+                fontSize: 10, fontWeight: 700,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                {totalFiltrosActivos}
+              </span>
+            )}
+          </button>
+          
+          {filtrosAbiertos && (
+            <div className="filtros-dropdown">
+              <div className="filtros-header">
+                <span>Filtrar por especificaciones</span>
+                {totalFiltrosActivos > 0 && (
+                  <button className="filtros-limpiar" onClick={limpiarFiltros}>
+                    Limpiar
+                  </button>
+                )}
+              </div>
+              {Object.keys(filtrosDisponibles).length === 0 ? (
+                <div className="filtros-vacio">
+                  {categoriaFiltro === "todas" 
+                    ? "Selecciona una categoría para ver filtros específicos" 
+                    : "No hay filtros disponibles para esta categoría"}
+                </div>
+              ) : (
+                Object.entries(filtrosDisponibles).map(([clave, valores]) => (
+                  <div key={clave} className="filtro-grupo">
+                    <div className="filtro-titulo">{clave}</div>
+                    <div className="filtro-opciones">
+                      {valores.map((valor) => (
+                        <button
+                          key={valor}
+                          className={`filtro-chip ${filtrosActivos[clave] === valor ? 'active' : ''}`}
+                          onClick={() => aplicarFiltro(clave, valor)}
+                        >
+                          {formatearValorFiltro(clave, valor)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+
         <button
           onClick={() => setCarritoAbierto(true)}
           style={{
@@ -556,60 +939,18 @@ const Vender = () => {
       {/* Grid */}
       <div style={{ flex: 1, overflowY: "auto", padding: "14px 20px", background: "#e8e8e8" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
-          {productosFiltrados.map((p) => (
-            <div
-              key={p.id}
-              className="vender-card"
-              onClick={() => agregarAlCarrito(p)}
-              title="Click para agregar al carrito"
-            >
-              <div className="vender-card-inner">
-                {/* FRENTE */}
-                <div className="vender-card-front">
-                  <div className="vender-card-img-bg">
-                    <div className="circle" />
-                    <div className="circle circle-bottom" />
-                    <div className="circle circle-right" />
-                  </div>
-                  <div className="vender-card-front-content">
-                    <span className="vender-card-badge">{p.categoria}</span>
-                    <div className="vender-card-desc">
-                      <div className="vender-card-title-row">
-                        <span>{p.nombre}</span>
-                      </div>
-                      <p className="vender-card-footer-text">
-                        Stock: {p.stock} &nbsp;|&nbsp; S/ {p.precio.toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                {/* DORSO */}
-                <div className="vender-card-back">
-                  <div className="vender-card-back-content">
-                    <svg stroke="#ffffff" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" height="40px" width="40px" fill="#ffffff">
-                      <path d="M20.84375 0.03125C20.191406 0.0703125 19.652344 0.425781 19.21875 1.53125C18.988281 2.117188 18.5 3.558594 18.03125 4.9375C17.792969 5.636719 17.570313 6.273438 17.40625 6.75C17.390625 6.796875 17.414063 6.855469 17.40625 6.90625C17.398438 6.925781 17.351563 6.949219 17.34375 6.96875L17.25 7.25C18.566406 7.65625 19.539063 8.058594 19.625 8.09375C22.597656 9.21875 28.351563 11.847656 33.28125 16.78125C38.5 22 41.183594 28.265625 42.09375 30.71875C42.113281 30.761719 42.375 31.535156 42.75 32.84375C42.757813 32.839844 42.777344 32.847656 42.78125 32.84375C43.34375 32.664063 44.953125 32.09375 46.3125 31.625C47.109375 31.351563 47.808594 31.117188 48.15625 31C49.003906 30.714844 49.542969 30.292969 49.8125 29.6875C50.074219 29.109375 50.066406 28.429688 49.75 27.6875C49.605469 27.347656 49.441406 26.917969 49.25 26.4375C47.878906 23.007813 45.007813 15.882813 39.59375 10.46875C33.613281 4.484375 25.792969 1.210938 22.125 0.21875C21.648438 0.0898438 21.234375 0.0078125 20.84375 0.03125 Z M 16.46875 9.09375L0.0625 48.625C-0.09375 48.996094 -0.00390625 49.433594 0.28125 49.71875C0.472656 49.910156 0.738281 50 1 50C1.128906 50 1.253906 49.988281 1.375 49.9375L40.90625 33.59375C40.523438 32.242188 40.222656 31.449219 40.21875 31.4375C39.351563 29.089844 36.816406 23.128906 31.875 18.1875C27.035156 13.34375 21.167969 10.804688 18.875 9.9375C18.84375 9.925781 17.8125 9.5 16.46875 9.09375 Z M 17 16C19.761719 16 22 18.238281 22 21C22 23.761719 19.761719 26 17 26C15.140625 26 13.550781 24.972656 12.6875 23.46875L15.6875 16.1875C16.101563 16.074219 16.550781 16 17 16 Z M 31 22C32.65625 22 34 23.34375 34 25C34 25.917969 33.585938 26.730469 32.9375 27.28125L32.90625 27.28125C33.570313 27.996094 34 28.949219 34 30C34 32.210938 32.210938 34 30 34C27.789063 34 26 32.210938 26 30C26 28.359375 26.996094 26.960938 28.40625 26.34375L28.3125 26.3125C28.117188 25.917969 28 25.472656 28 25C28 23.34375 29.34375 22 31 22 Z M 21 32C23.210938 32 25 33.789063 25 36C25 36.855469 24.710938 37.660156 24.25 38.3125L20.3125 39.9375C18.429688 39.609375 17 37.976563 17 36C17 33.789063 18.789063 32 21 32 Z M 9 34C10.65625 34 12 35.34375 12 37C12 38.65625 10.65625 40 9 40C7.902344 40 6.960938 39.414063 6.4375 38.53125L8.25 34.09375C8.488281 34.03125 8.742188 34 9 34Z" />
-                    </svg>
-                    <strong>{p.nombre}</strong>
-                    <span className="vender-card-back-precio">S/ {p.precio.toFixed(2)}</span>
-                    <span className="vender-card-back-stock">{p.stock} disponibles</span>
-                  </div>
-                </div>
-              </div>
-              {/* Lupa fuera del flip para que siempre sea clickeable */}
-              <button
-                className="vender-card-lupa"
-                onClick={(e) => { e.stopPropagation(); setProductoDetalle(p); }}
-                title="Ver detalles"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1e293b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="7" />
-                  <line x1="16.5" y1="16.5" x2="22" y2="22" />
-                  <line x1="8" y1="11" x2="14" y2="11" />
-                  <line x1="11" y1="8" x2="11" y2="14" />
-                </svg>
-              </button>
-            </div>
-          ))}
+          {productosFiltrados.map((p) => {
+            const todasImagenes = [p.imagenPrincipal, ...(p.imagenesSecundarias || [])].filter(Boolean);
+            return (
+              <ProductoCard
+                key={p.id}
+                producto={p}
+                imagenes={todasImagenes}
+                onAgregar={() => agregarAlCarrito(p)}
+                onVerDetalle={() => setProductoDetalle(p)}
+              />
+            );
+          })}
         </div>
       </div>
 
@@ -629,33 +970,81 @@ const Vender = () => {
 
       {/* Modal detalle */}
       {productoDetalle && (
-        <div className="modal-overlay" onClick={() => setProductoDetalle(null)}>
+        <div className="modal-overlay" onClick={() => { setProductoDetalle(null); setImagenActual(0); }}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               Detalles del Producto
-              <button onClick={() => setProductoDetalle(null)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#64748b" }}>✕</button>
+              <button onClick={() => { setProductoDetalle(null); setImagenActual(0); }} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#64748b" }}>✕</button>
             </div>
             <div className="modal-body">
-              <div className="modal-img">🍕</div>
+              <div className="modal-img">
+                {(() => {
+                  const imagenes = [
+                    productoDetalle.imagenPrincipal,
+                    ...(productoDetalle.imagenesSecundarias || [])
+                  ].filter(Boolean);
+                  
+                  const totalImagenes = imagenes.length;
+                  
+                  if (totalImagenes === 0) {
+                    return <span>🍕</span>;
+                  }
+                  
+                  return (
+                    <>
+                      <img src={imagenes[imagenActual]} alt={productoDetalle.nombre} />
+                      {totalImagenes > 1 && (
+                        <>
+                          <button
+                            className="carrusel-btn carrusel-btn-prev"
+                            onClick={() => setImagenActual((prev) => (prev === 0 ? totalImagenes - 1 : prev - 1))}
+                          >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e293b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="15 18 9 12 15 6" />
+                            </svg>
+                          </button>
+                          <button
+                            className="carrusel-btn carrusel-btn-next"
+                            onClick={() => setImagenActual((prev) => (prev === totalImagenes - 1 ? 0 : prev + 1))}
+                          >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e293b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="9 18 15 12 9 6" />
+                            </svg>
+                          </button>
+                          <div className="carrusel-indicadores">
+                            {imagenes.map((_, i) => (
+                              <div
+                                key={i}
+                                className={`carrusel-dot ${i === imagenActual ? 'active' : ''}`}
+                                onClick={() => setImagenActual(i)}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
               <div className="modal-info">
                 <div className="modal-nombre">{productoDetalle.nombre}</div>
+                <div style={{ fontWeight: 700, fontSize: "0.88rem", color: "#1e293b", marginBottom: 8, marginTop: 4 }}>Descripción del Producto</div>
+                <div className="modal-desc">{productoDetalle.descripcion}</div>
                 <div className="modal-precio-box">
                   Precio: <span>S/ {productoDetalle.precio.toFixed(2)}</span><br />
                   Disponibilidad: <span style={{ color: "#16a34a" }}>{productoDetalle.stock} unidades en stock</span>
                 </div>
-                <div style={{ fontWeight: 700, fontSize: "0.85rem", color: "#1e293b", marginBottom: 6 }}>Descripción del Producto</div>
-                <div className="modal-desc">{productoDetalle.descripcion}</div>
-                <div style={{ fontSize: "0.78rem", color: "#64748b" }}>Categoría: {productoDetalle.categoria}</div>
+                <div style={{ fontSize: "0.8rem", color: "#64748b", marginTop: 10 }}>Categoría: <span style={{ fontWeight: 600, color: "#1e293b" }}>{productoDetalle.categoria}</span></div>
               </div>
             </div>
             <div className="modal-footer">
               <button
                 className="btn-agregar"
-                onClick={() => { agregarAlCarrito(productoDetalle); setProductoDetalle(null); }}
+                onClick={() => { agregarAlCarrito(productoDetalle); setProductoDetalle(null); setImagenActual(0); }}
               >
                 Agregar al Carrito
               </button>
-              <button className="btn-cerrar-modal" onClick={() => setProductoDetalle(null)}>Cerrar</button>
+              <button className="btn-cerrar-modal" onClick={() => { setProductoDetalle(null); setImagenActual(0); }}>Cerrar</button>
             </div>
           </div>
         </div>

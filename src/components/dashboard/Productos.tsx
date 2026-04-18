@@ -1,14 +1,16 @@
 import { useState } from "react";
 import type { Producto } from "../../types/producto";
-import { CATEGORIAS, productosEjemplo } from "../../data/productos";
+import { CATEGORIAS } from "../../data/productos";
+import { useProductos } from "../../context/ProductosContext";
 
 const EMPTY_FORM = {
-  nombre: "", precio: "", costo: "", stock: "", stockMinimo: "",
+  nombre: "", marca: "", modelo: "", precio: "", costo: "", stock: "", stockMinimo: "",
   categoria: CATEGORIAS[0], descripcion: "", codigo: "", destacado: false,
+  imagenPrincipal: "", imagenesSecundarias: ["", "", "", ""],
 };
 
 const Productos = () => {
-  const [productos, setProductos] = useState<Producto[]>(productosEjemplo);
+  const { productos, agregarProducto } = useProductos();
   const [form, setForm] = useState(EMPTY_FORM);
   const [busqueda, setBusqueda] = useState("");
 
@@ -20,21 +22,52 @@ const Productos = () => {
     }));
   };
 
+  const handleImagenPrincipal = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setForm((prev) => ({ ...prev, imagenPrincipal: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleImagenSecundaria = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setForm((prev) => {
+          const nuevasImagenes = [...prev.imagenesSecundarias];
+          nuevasImagenes[index] = reader.result as string;
+          return { ...prev, imagenesSecundarias: nuevasImagenes };
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const nuevo: Producto = {
       id: Date.now(),
       nombre: form.nombre,
+      marca: form.marca,
+      modelo: form.modelo,
+      categoria: form.categoria,
       precio: parseFloat(form.precio) || 0,
       costo: parseFloat(form.costo) || 0,
       stock: parseInt(form.stock) || 0,
       stockMinimo: parseInt(form.stockMinimo) || 0,
-      categoria: form.categoria,
-      descripcion: form.descripcion,
       codigo: form.codigo,
+      descripcion: form.descripcion,
       destacado: form.destacado,
+      especificaciones: {},
+      imagenPrincipal: form.imagenPrincipal,
+      imagenesSecundarias: form.imagenesSecundarias.filter(img => img !== ""),
     };
-    setProductos((prev) => [nuevo, ...prev]);
+    agregarProducto(nuevo);
     setForm(EMPTY_FORM);
   };
 
@@ -60,9 +93,9 @@ const Productos = () => {
         .prod-input:focus { border-color: #2563eb; }
         .prod-label { font-size: 0.72rem; font-weight: 600; color: #64748b; margin-bottom: 4px; display: block; }
         .prod-section { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 16px; }
-        .prod-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
-        .prod-table th { background: #f8fafc; padding: 8px 12px; text-align: left; font-weight: 600; color: #64748b; border-bottom: 1px solid #e2e8f0; }
-        .prod-table td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
+        .prod-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; min-width: 1200px; }
+        .prod-table th { background: #f8fafc; padding: 10px 12px; font-weight: 600; color: #64748b; border-bottom: 1px solid #e2e8f0; text-align: center; }
+        .prod-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; color: #1e293b; text-align: center; vertical-align: middle; }
         .prod-table tr:hover td { background: #f8fafc; }
         .stock-badge {
           display: inline-block; padding: 2px 8px; border-radius: 20px;
@@ -100,16 +133,72 @@ const Productos = () => {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <div>
                 <span className="prod-label">Portada</span>
-                <div style={{ width: "100%", aspectRatio: "1/1", background: "#e2e8f0", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "2px dashed #cbd5e1" }}>
-                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImagenPrincipal}
+                  style={{ display: "none" }}
+                  id="imagen-principal"
+                />
+                <label
+                  htmlFor="imagen-principal"
+                  style={{
+                    width: "100%",
+                    aspectRatio: "1/1",
+                    background: form.imagenPrincipal ? `url(${form.imagenPrincipal}) center/cover` : "#e2e8f0",
+                    borderRadius: 8,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    border: "2px dashed #cbd5e1",
+                    position: "relative",
+                    overflow: "hidden"
+                  }}
+                >
+                  {!form.imagenPrincipal && (
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7 10 12 15 17 10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                  )}
+                </label>
               </div>
               <div>
                 <span className="prod-label">Galería</span>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4 }}>
-                  {[0,1,2,3].map((i) => (
-                    <div key={i} style={{ aspectRatio: "1/1", background: "#e2e8f0", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "1px dashed #cbd5e1" }}>
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  {[0, 1, 2, 3].map((i) => (
+                    <div key={i}>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleImagenSecundaria(i, e)}
+                        style={{ display: "none" }}
+                        id={`imagen-secundaria-${i}`}
+                      />
+                      <label
+                        htmlFor={`imagen-secundaria-${i}`}
+                        style={{
+                          aspectRatio: "1/1",
+                          background: form.imagenesSecundarias[i] ? `url(${form.imagenesSecundarias[i]}) center/cover` : "#e2e8f0",
+                          borderRadius: 6,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "pointer",
+                          border: "1px dashed #cbd5e1",
+                          overflow: "hidden"
+                        }}
+                      >
+                        {!form.imagenesSecundarias[i] && (
+                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                          </svg>
+                        )}
+                      </label>
                     </div>
                   ))}
                 </div>
@@ -121,6 +210,16 @@ const Productos = () => {
               <div>
                 <label className="prod-label">Nombre del producto</label>
                 <input className="prod-input" name="nombre" value={form.nombre} onChange={handleChange} placeholder="Nombre del producto" required />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                <div>
+                  <label className="prod-label">Marca</label>
+                  <input className="prod-input" name="marca" value={form.marca} onChange={handleChange} placeholder="Marca" required />
+                </div>
+                <div>
+                  <label className="prod-label">Modelo</label>
+                  <input className="prod-input" name="modelo" value={form.modelo} onChange={handleChange} placeholder="Modelo" required />
+                </div>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                 <div>
@@ -191,6 +290,8 @@ const Productos = () => {
                 <tr>
                   <th>Código</th>
                   <th>Nombre</th>
+                  <th>Marca</th>
+                  <th>Modelo</th>
                   <th>Categoría</th>
                   <th>Precio</th>
                   <th>Costo</th>
@@ -205,6 +306,8 @@ const Productos = () => {
                     <tr key={p.id}>
                       <td style={{ color: "#64748b", fontFamily: "monospace" }}>{p.codigo}</td>
                       <td style={{ fontWeight: 600 }}>{p.nombre}{p.destacado && <span style={{ marginLeft: 6, color: "#f59e0b", fontSize: "0.7rem" }}>★</span>}</td>
+                      <td>{p.marca}</td>
+                      <td>{p.modelo}</td>
                       <td>{p.categoria}</td>
                       <td>S/ {p.precio.toFixed(2)}</td>
                       <td style={{ color: "#64748b" }}>S/ {p.costo.toFixed(2)}</td>
