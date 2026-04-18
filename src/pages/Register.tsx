@@ -2,19 +2,12 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-const BG_URL =
-  "https://www.caseking.de/blog/wp-content/uploads/2025/08/AD_4nXd2eRvsZII7ieRqFrh7gm0zG9FdUyFye60kZNNvrEA8dmqkFQ8Ad_0Vo53dKuw9kcodhQMw1LXfEyvlTbiMjnv_0y9Gqac9t07f1z682I3d0afx9ydXKJ276w37rbnhypHs3OO2-Q.jpg";
-
 interface RegisterForm {
-  companyName: string;
-  phone: string;
+  nombre: string;
+  apellido: string;
   email: string;
-  address: string;
-  province: string;
-  district: string;
   password: string;
   confirmPassword: string;
-  acceptTerms: boolean;
 }
 
 const inputStyle: React.CSSProperties = {
@@ -40,42 +33,27 @@ const Register = () => {
   const navigate = useNavigate();
 
   const [form, setForm] = useState<RegisterForm>({
-    companyName: "",
-    phone: "",
+    nombre: "",
+    apellido: "",
     email: "",
-    address: "",
-    province: "",
-    district: "",
     password: "",
     confirmPassword: "",
-    acceptTerms: false,
   });
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (
-      !form.companyName ||
-      !form.phone ||
-      !form.email ||
-      !form.address ||
-      !form.password ||
-      !form.confirmPassword
-    ) {
-      setError("Por favor completa todos los campos obligatorios.");
+    if (!form.nombre || !form.apellido || !form.email || !form.password || !form.confirmPassword) {
+      setError("Por favor completa todos los campos.");
       return;
     }
 
@@ -89,15 +67,9 @@ const Register = () => {
       return;
     }
 
-    if (!form.acceptTerms) {
-      setError("Debes aceptar los términos y condiciones.");
-      return;
-    }
-
     const users = JSON.parse(localStorage.getItem("eagle_users") || "[]");
-
-    const exists = users.find(
-      (u: { email: string }) => u.email.toLowerCase() === form.email.toLowerCase()
+    const exists = users.find((u: { email: string }) =>
+      u.email.toLowerCase() === form.email.toLowerCase()
     );
 
     if (exists) {
@@ -105,40 +77,97 @@ const Register = () => {
       return;
     }
 
-    const newUser = {
-      companyName: form.companyName,
-      phone: form.phone,
+    users.push({
+      nombre: form.nombre,
+      apellido: form.apellido,
       email: form.email,
-      address: form.address,
-      province: form.province,
-      district: form.district,
       password: form.password,
-      acceptTerms: form.acceptTerms,
-    };
-
-    users.push(newUser);
+    });
     localStorage.setItem("eagle_users", JSON.stringify(users));
 
     setSuccess(true);
-
-    setTimeout(() => {
-      navigate("/");
-    }, 1500);
+    setTimeout(() => navigate("/login"), 1500);
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        height: "100vh",
-        width: "100%",
-        backgroundImage: `url('${BG_URL}')`,
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
-      }}
-    >
+    <div style={{
+      display: "flex",
+      height: "100vh",
+      width: "100%",
+      position: "relative",
+      overflow: "hidden",
+    }}>
+      <style>{`
+        @keyframes slideInLeft {
+          from { opacity: 0; transform: translateX(-60px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+          from { opacity: 0; transform: translateX(60px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes fadeInDown {
+          from { opacity: 0; transform: translateY(-20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .panel-left {
+          animation: slideInLeft 0.6s ease forwards;
+        }
+        .panel-right {
+          animation: slideInRight 0.6s ease forwards;
+        }
+        .form-title {
+          opacity: 0;
+          animation: fadeInDown 0.6s ease 0.3s forwards;
+        }
+        .form-field {
+          opacity: 0;
+          animation: fadeInDown 0.5s ease forwards;
+        }
+        .form-field:nth-child(1) { animation-delay: 0.2s; }
+        .form-field:nth-child(2) { animation-delay: 0.3s; }
+        .form-field:nth-child(3) { animation-delay: 0.4s; }
+        .form-field:nth-child(4) { animation-delay: 0.5s; }
+        .form-field:nth-child(5) { animation-delay: 0.6s; }
+        .form-btn {
+          opacity: 0;
+          animation: fadeInDown 0.5s ease 0.7s forwards;
+        }
+        .form-link {
+          opacity: 0;
+          animation: fadeInDown 0.5s ease 0.8s forwards;
+        }
+      `}</style>
+
+      {/* Video de fondo */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: "absolute",
+          top: 0, left: 0,
+          width: "100%", height: "100%",
+          objectFit: "cover",
+          zIndex: 0,
+        }}
+      >
+        <source src="/12220492_1920_1080_25fps.mp4" type="video/mp4" />
+      </video>
+
+      {/* Overlay oscuro */}
+      <div style={{
+        position: "absolute",
+        top: 0, left: 0,
+        width: "100%", height: "100%",
+        background: "rgba(0,0,0,0.50)",
+        zIndex: 1,
+      }} />
+
+      {/* Panel izquierdo */}
       <div
+        className="panel-left"
         style={{
           flex: 1,
           display: "flex",
@@ -146,204 +175,138 @@ const Register = () => {
           justifyContent: "center",
           padding: "0 60px",
           color: "#fff",
-          background: "rgba(0,0,0,0.25)",
+          position: "relative",
+          zIndex: 2,
         }}
       >
-        <h1
-          style={{
-            fontSize: 48,
-            fontWeight: 700,
-            marginBottom: 16,
-            lineHeight: 1.2,
-            textAlign: "left",
-          }}
-        >
-          Bienvenido
-          <br />
-          a EAGLE GAMING
+        <h1 style={{
+          fontSize: 36,
+          fontWeight: 800,
+          fontFamily: "'Orbitron', sans-serif",
+          lineHeight: 1.6,
+          color: "#fff",
+          textAlign: "left",
+          textShadow: "none",
+        }}>
+          Bienvenido<br />a EAGLE GAMING
         </h1>
 
-        <p
-          style={{
-            fontSize: 14,
-            maxWidth: 380,
-            opacity: 0.9,
-            lineHeight: 1.6,
-          }}
-        >
-          Crea tu cuenta para acceder a la plataforma y administrar tu panel de
-          control.
+        <p style={{
+          fontSize: 15,
+          fontFamily: "'Roboto', sans-serif",
+          fontWeight: 600,
+          maxWidth: 380,
+          opacity: 0.9,
+          lineHeight: 1.6,
+          textAlign: "left",
+        }}>
+          Únete a Eagle Gaming y lleva tu negocio al siguiente nivel.
+          Registra tu cuenta y accede a herramientas diseñadas para gestionar
+          tu tienda de gaming de forma profesional y eficiente.
         </p>
       </div>
 
+      {/* Panel derecho */}
       <div
+        className="panel-right"
         style={{
-          width: 440,
+          width: 420,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           padding: "40px",
           background: "rgba(255,255,255,0.12)",
           backdropFilter: "blur(12px)",
-          overflowY: "auto",
+          position: "relative",
+          zIndex: 2,
         }}
       >
         <div style={{ width: "100%" }}>
           <h2
+            className="form-title"
             style={{
-              color: "#fff",
-              textAlign: "center",
-              fontSize: 28,
-              fontWeight: 600,
-              marginBottom: 24,
+              color: "#fff", textAlign: "center",
+              fontSize: 28, fontWeight: 600, marginBottom: 24,
             }}
           >
             Regístrate
           </h2>
 
           {error && (
-            <p
-              style={{
-                color: "#ff6b6b",
-                fontSize: 13,
-                marginBottom: 12,
-                textAlign: "center",
-              }}
-            >
+            <p style={{ color: "#ff6b6b", fontSize: 13, marginBottom: 12, textAlign: "center" }}>
               {error}
             </p>
           )}
 
           {success && (
-            <p
-              style={{
-                color: "#6bffb8",
-                fontSize: 13,
-                marginBottom: 12,
-                textAlign: "center",
-              }}
-            >
-              ¡Cuenta creada exitosamente! Redirigiendo al login...
+            <p style={{ color: "#6bffb8", fontSize: 13, marginBottom: 12, textAlign: "center" }}>
+              ¡Cuenta creada! Redirigiendo al login...
             </p>
           )}
 
-          <form
-            onSubmit={handleSubmit}
-            style={{ display: "flex", flexDirection: "column", gap: 14 }}
-          >
-            <div>
-              <label style={labelStyle}>Nombre de la inmobiliaria *</label>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div className="form-field">
+              <label style={labelStyle}>Nombre</label>
               <input
                 type="text"
-                name="companyName"
-                placeholder="lauret"
-                value={form.companyName}
+                name="nombre"
+                placeholder="Juan"
+                value={form.nombre}
                 onChange={handleChange}
                 style={inputStyle}
               />
             </div>
 
-            <div>
-              <label style={labelStyle}>Teléfono *</label>
+            <div className="form-field">
+              <label style={labelStyle}>Apellido</label>
               <input
-                type="tel"
-                name="phone"
-                placeholder="987654321"
-                value={form.phone}
+                type="text"
+                name="apellido"
+                placeholder="Pérez"
+                value={form.apellido}
                 onChange={handleChange}
                 style={inputStyle}
               />
             </div>
 
-            <div>
-              <label style={labelStyle}>Email *</label>
+            <div className="form-field">
+              <label style={labelStyle}>Email</label>
               <input
                 type="email"
                 name="email"
-                placeholder="correo@empresa.com"
+                placeholder="correo@ejemplo.com"
                 value={form.email}
                 onChange={handleChange}
                 style={inputStyle}
               />
             </div>
 
-            <div>
-              <label style={labelStyle}>Dirección *</label>
-              <input
-                type="text"
-                name="address"
-                placeholder="Av. 12 junio la miranda"
-                value={form.address}
-                onChange={handleChange}
-                style={inputStyle}
-              />
-            </div>
-
-            <div>
-              <label style={labelStyle}>Provincia</label>
-              <input
-                type="text"
-                name="province"
-                value={form.province}
-                onChange={handleChange}
-                style={inputStyle}
-              />
-            </div>
-
-            <div>
-              <label style={labelStyle}>Distrito</label>
-              <input
-                type="text"
-                name="district"
-                value={form.district}
-                onChange={handleChange}
-                style={inputStyle}
-              />
-            </div>
-
-            <div>
-              <label style={labelStyle}>Contraseña *</label>
+            <div className="form-field">
+              <label style={labelStyle}>Contraseña</label>
               <input
                 type="password"
                 name="password"
-                placeholder="Ingresa tu contraseña"
+                placeholder="••••••••"
                 value={form.password}
                 onChange={handleChange}
                 style={inputStyle}
               />
             </div>
 
-            <div>
-              <label style={labelStyle}>Confirmar contraseña *</label>
+            <div className="form-field">
+              <label style={labelStyle}>Confirmar contraseña</label>
               <input
                 type="password"
                 name="confirmPassword"
-                placeholder="Repite tu contraseña"
+                placeholder="••••••••"
                 value={form.confirmPassword}
                 onChange={handleChange}
                 style={inputStyle}
               />
             </div>
 
-            <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-              <input
-                type="checkbox"
-                id="acceptTerms"
-                name="acceptTerms"
-                checked={form.acceptTerms}
-                onChange={handleChange}
-                style={{ marginTop: 2 }}
-              />
-              <label
-                htmlFor="acceptTerms"
-                style={{ color: "#fff", fontSize: 13, lineHeight: 1.4 }}
-              >
-                Acepto mis datos personales para fines comerciales y/o
-                publicitarios.
-              </label>
-            </div>
-
             <button
+              className="form-btn"
               type="submit"
               style={{
                 padding: "11px",
@@ -361,16 +324,8 @@ const Register = () => {
             </button>
           </form>
 
-          <div style={{ marginTop: 16, textAlign: "center" }}>
-            <Link
-              to="/"
-              style={{
-                color: "#fff",
-                fontSize: 13,
-                textDecoration: "none",
-                opacity: 0.85,
-              }}
-            >
+          <div className="form-link" style={{ marginTop: 16, textAlign: "center" }}>
+            <Link to="/login" style={{ color: "#fff", fontSize: 13, textDecoration: "none", opacity: 0.85 }}>
               ¿Ya tienes cuenta? Inicia sesión
             </Link>
           </div>

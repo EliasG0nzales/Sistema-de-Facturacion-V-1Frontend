@@ -8,32 +8,27 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    setError("");
 
-    // Usuario hardcodeado (admin)
-    if (email === "admin@gmail.com" && password === "1234") {
-      login({ username: email, role: "admin" });
-      navigate("/dashboard");
-      return;
-    }
-
-    // Usuarios registrados en localStorage
     const users = JSON.parse(localStorage.getItem("eagle_users") || "[]");
     const found = users.find(
       (u: { email: string; password: string }) =>
-        u.email === email && u.password === password
+        u.email.toLowerCase() === email.toLowerCase() &&
+        u.password === password
     );
 
-    if (found) {
-      login({ username: found.email, role: "user" });
-      if (remember) {
-        localStorage.setItem("eagle_remember", email);
-      }
+    const isAdmin = email === "admin@gmail.com" && password === "1234";
+
+    if (found || isAdmin) {
+      login({
+        username: found ? `${found.nombre} ${found.apellido}` : "Admin",
+        role: isAdmin ? "admin" : "user",
+      });
       navigate("/dashboard");
     } else {
       setError("Correo o contraseña incorrectos");
@@ -41,17 +36,42 @@ const Login = () => {
   };
 
   return (
-    <div
-    style={{ 
-        display: "flex",
-        height: "100vh",
-        width: "100vw",              // 👈 importante
-        backgroundImage: "url('https://www.caseking.de/blog/wp-content/uploads/2025/08/AD_4nXd2eRvsZII7ieRqFrh7gm0zG9FdUyFye60kZNNvrEA8dmqkFQ8Ad_0Vo53dKuw9kcodhQMw1LXfEyvlTbiMjnv_0y9Gqac9t07f1z682I3d0afx9ydXKJ276w37rbnhypHs3OO2-Q.jpg')",
-        backgroundSize: "cover",     // 👈 llena toda la pantalla
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-    }}
-        >
+    <div style={{
+      display: "flex",
+      height: "100vh",
+      width: "100vw",
+      position: "relative",
+      overflow: "hidden",
+    }}>
+
+      ```typescriptreact
+{/* Video de fondo */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: "absolute",
+          top: 0, left: 0,
+          width: "100%", height: "100%",
+          objectFit: "cover",
+          zIndex: 0,
+        }}
+      >
+        <source src="/gamer.mp4" type="video/mp4" />
+      </video>
+```
+
+      {/* Overlay oscuro */}
+      <div style={{
+        position: "absolute",
+        top: 0, left: 0,
+        width: "100%", height: "100%",
+        background: "rgba(0,0,0,0.55)",
+        zIndex: 1,
+      }} />
+
       {/* Panel izquierdo */}
       <div style={{
         flex: 1,
@@ -61,19 +81,36 @@ const Login = () => {
         alignItems: "flex-start",
         padding: "0 60px",
         color: "#fff",
+        position: "relative",
+        zIndex: 2,
       }}>
-        <h1 style={{ fontSize: 48, fontWeight: 500, lineHeight: 1.4, color: "#fff", textAlign: "left", textShadow: "none", }}>
-          Bienvenido<br />
-          a EAGLE GAMING
+        <h1 style={{
+          fontSize: 36,
+          fontWeight: 800,
+          fontFamily: "'Orbitron', sans-serif",
+          lineHeight: 1.6,
+          color: "#fff",
+          textAlign: "left",
+          textShadow: "none",
+        }}>
+          Bienvenido<br />a EAGLE GAMING
         </h1>
-        <p style={{ fontSize: 14, maxWidth: 380, opacity: 0.85, lineHeight: 1.6 }}>
-          Es un hecho bien establecido que un lector se distraerá con el
-          contenido legible de una página al observar su diseño. El objetivo
-          de usar esto es...
+
+        <p style={{
+          fontSize: 15,
+          fontFamily: "'Roboto', sans-serif",
+          fontWeight: 600,
+          maxWidth: 380,
+          opacity: 0.9,
+          lineHeight: 1.6,
+          textAlign: "left",
+        }}>
+          Eagle Gaming es tu plataforma de gestión para negocios de videojuegos y tecnología.
+          Administra ventas, productos y clientes desde un solo lugar, rápido y sin complicaciones.
         </p>
       </div>
 
-      {/* Panel derecho - formulario */}
+      {/* Panel derecho */}
       <div style={{
         width: 420,
         display: "flex",
@@ -82,9 +119,14 @@ const Login = () => {
         padding: "40px",
         background: "rgba(255,255,255,0.12)",
         backdropFilter: "blur(12px)",
+        position: "relative",
+        zIndex: 2,
       }}>
         <div style={{ width: "100%" }}>
-          <h2 style={{ color: "#fff", textAlign: "center", fontSize: 28, fontWeight: 600, marginBottom: 28 }}>
+          <h2 style={{
+            color: "#fff", textAlign: "center",
+            fontSize: 28, fontWeight: 600, marginBottom: 28,
+          }}>
             Iniciar sesión
           </h2>
 
@@ -95,6 +137,7 @@ const Login = () => {
           )}
 
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {/* Email */}
             <div>
               <label style={{ color: "#fff", fontSize: 14, display: "block", marginBottom: 6 }}>
                 Correo electrónico
@@ -112,31 +155,65 @@ const Login = () => {
                   background: "rgba(255,255,255,0.9)",
                   fontSize: 14,
                   boxSizing: "border-box",
+                  color: "#333",
                 }}
               />
             </div>
 
+            {/* Contraseña con ojito */}
             <div>
               <label style={{ color: "#fff", fontSize: 14, display: "block", marginBottom: 6 }}>
                 Contraseña
               </label>
-              <input
-                type="password"
-                placeholder="••••••••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px 14px",
-                  borderRadius: 6,
-                  border: "none",
-                  background: "rgba(255,255,255,0.9)",
-                  fontSize: 14,
-                  boxSizing: "border-box",
-                }}
-              />
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 44px 10px 14px",
+                    borderRadius: 6,
+                    border: "none",
+                    background: "rgba(255,255,255,0.9)",
+                    fontSize: 14,
+                    boxSizing: "border-box",
+                    color: "#333",
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: "absolute",
+                    right: 12,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 0,
+                    lineHeight: 1,
+                  }}
+                >
+                  {showPassword ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
+            {/* Recuérdame */}
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <input
                 type="checkbox"
