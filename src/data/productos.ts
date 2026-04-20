@@ -33,8 +33,15 @@ export const productosEjemplo: Producto[] = [
       panelLateral: "Vidrio templado",
       ventiladores: "2x 120mm incluidos",
       bahias: "2x 3.5 pulgadas, 2x 2.5 pulgadas",
-      puertosUSB: "USB 3.1 Gen 1, USB-C"
-    }
+      puertosUSB: "USB 3.1 Gen 1, USB-C",
+    },
+    imagenPrincipal: "rmx750x.jpg",
+    imagenesSecundarias: [
+      "/productos/rmx750x.jpg",
+      "/productos/rmx750x.jpg",
+      "/productos/rmx750x.jpg",
+      "/productos/rmx750x.jpg",
+    ]
   },
   {
     id: 10,
@@ -54,8 +61,15 @@ export const productosEjemplo: Producto[] = [
       certificacion: "80 Plus Gold",
       modular: "Totalmente modular",
       ventilador: "135mm",
-      protecciones: "OVP, UVP, OCP, OTP, SCP"
-    }
+      protecciones: "OVP, UVP, OCP, OTP, SCP",
+    },
+    imagenPrincipal: "https://m.media-amazon.com/images/I/71j4oBrz7HL._AC_SL1500_.jpg",
+    imagenesSecundarias: [
+      "https://m.media-amazon.com/images/I/71cYopPmiqL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71oRgB7WBLL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61BIe0JBKZL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/81ZTx8EUi8L._AC_SL1500_.jpg",
+    ],
   },
   {
     id: 1,
@@ -75,8 +89,15 @@ export const productosEjemplo: Producto[] = [
       tipoMemoria: "GDDR6",
       interfaz: "PCIe 4.0",
       consumo: "170W",
-      conectores: "HDMI 2.1, DisplayPort 1.4a"
-    }
+      conectores: "HDMI 2.1, DisplayPort 1.4a",
+    },
+    imagenPrincipal: "https://m.media-amazon.com/images/I/71nMTTJUlnL._AC_SL1500_.jpg",
+    imagenesSecundarias: [
+      "https://m.media-amazon.com/images/I/71C6JZFSJRL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71xpEKFaYbL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/81bJTxmfRkL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71g3FBIpFuL._AC_SL1500_.jpg",
+    ],
   },
   {
     id: 2,
@@ -96,8 +117,15 @@ export const productosEjemplo: Producto[] = [
       tipoMemoria: "GDDR6X",
       interfaz: "PCIe 4.0",
       consumo: "200W",
-      conectores: "HDMI 2.1, DisplayPort 1.4a"
-    }
+      conectores: "HDMI 2.1, DisplayPort 1.4a",
+    },
+    imagenPrincipal: "https://m.media-amazon.com/images/I/81MndMPqWQL._AC_SL1500_.jpg",
+    imagenesSecundarias: [
+      "https://m.media-amazon.com/images/I/81+g7RJFIXL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71Q3YTkK3yL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71sMk5KRJNL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71RkLdFbIxL._AC_SL1500_.jpg",
+    ],
   },
   {
     id: 7,
@@ -118,8 +146,15 @@ export const productosEjemplo: Producto[] = [
       panelTipo: "IPS",
       tasaRefresco: "144Hz",
       tiempoRespuesta: "1ms",
-      conectores: "HDMI, DisplayPort"
-    }
+      conectores: "HDMI, DisplayPort",
+    },
+    imagenPrincipal: "https://m.media-amazon.com/images/I/71gqvpCRXoL._AC_SL1500_.jpg",
+    imagenesSecundarias: [
+      "https://m.media-amazon.com/images/I/71W3VgTZnBL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71GZXiIkFHL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71WEEn2CVNL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61Ps4PNYGDL._AC_SL1500_.jpg",
+    ],
   },
   {
     id: 8,
@@ -141,8 +176,15 @@ export const productosEjemplo: Producto[] = [
       tasaRefresco: "165Hz",
       tiempoRespuesta: "1ms",
       curvatura: "1000R",
-      conectores: "HDMI, DisplayPort"
-    }
+      conectores: "HDMI, DisplayPort",
+    },
+    imagenPrincipal: "https://m.media-amazon.com/images/I/61a2y1IOSHL._AC_SL1500_.jpg",
+    imagenesSecundarias: [
+      "https://m.media-amazon.com/images/I/71e75sxT-cL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71F-sT3KU8L._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71xGY8F3CXL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71K1UrDNbrL._AC_SL1500_.jpg",
+    ],
   },
   {
     id: 12,
@@ -163,8 +205,15 @@ export const productosEjemplo: Producto[] = [
       iluminacion: "RGB por tecla",
       conectividad: "USB",
       teclas: "104 teclas",
-      reposaMuñecas: "Incluido"
-    }
+      reposaMuñecas: "Incluido",
+    },
+    imagenPrincipal: "https://m.media-amazon.com/images/I/91kYCIAYFjL._AC_SL1500_.jpg",
+    imagenesSecundarias: [
+      "https://m.media-amazon.com/images/I/81pLriHAYbL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71kC8JLHAKL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71KJsZVgQBL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71n6KImmMkL._AC_SL1500_.jpg",
+    ],
   },
   {
     id: 9,
@@ -186,8 +235,15 @@ export const productosEjemplo: Producto[] = [
       memoriaMax: "128GB",
       slotsRAM: 4,
       m2Slots: 2,
-      pcie: "PCIe 4.0"
-    }
+      pcie: "PCIe 4.0",
+    },
+    imagenPrincipal: "https://m.media-amazon.com/images/I/81VB3HYJDQL._AC_SL1500_.jpg",
+    imagenesSecundarias: [
+      "https://m.media-amazon.com/images/I/91x5GWOFQRL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/81DcbZTSSQL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71a-eNKUNML._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/81SfFJtQvYL._AC_SL1500_.jpg",
+    ],
   },
   {
     id: 3,
@@ -207,8 +263,15 @@ export const productosEjemplo: Producto[] = [
       tipo: "DDR4",
       velocidad: "3200MHz",
       latencia: "CL16",
-      voltaje: "1.35V"
-    }
+      voltaje: "1.35V",
+    },
+    imagenPrincipal: "https://m.media-amazon.com/images/I/71YnG-LLfGL._AC_SL1500_.jpg",
+    imagenesSecundarias: [
+      "https://m.media-amazon.com/images/I/71Xjb7YDLML._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71l5JLHV+lL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/81W1fhF8NQL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71bXnDNDLzL._AC_SL1500_.jpg",
+    ],
   },
   {
     id: 4,
@@ -229,8 +292,15 @@ export const productosEjemplo: Producto[] = [
       velocidad: "3600MHz",
       latencia: "CL18",
       voltaje: "1.35V",
-      rgb: "Sí"
-    }
+      rgb: "Sí",
+    },
+    imagenPrincipal: "https://m.media-amazon.com/images/I/71pP84RaCBL._AC_SL1500_.jpg",
+    imagenesSecundarias: [
+      "https://m.media-amazon.com/images/I/71GlMimHQcL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/81ZbTLNI0XL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71A3bEBPYFL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71h9FcUGUQL._AC_SL1500_.jpg",
+    ],
   },
   {
     id: 5,
@@ -250,8 +320,15 @@ export const productosEjemplo: Producto[] = [
       interfaz: "SATA III",
       velocidadLectura: "500 MB/s",
       velocidadEscritura: "450 MB/s",
-      formato: "2.5 pulgadas"
-    }
+      formato: "2.5 pulgadas",
+    },
+    imagenPrincipal: "https://m.media-amazon.com/images/I/61RP6Nb4GzL._AC_SL1000_.jpg",
+    imagenesSecundarias: [
+      "https://m.media-amazon.com/images/I/71THGhFBFML._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/91oBEANBIUL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/81gGsmWoJTL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71RsZFPKiFL._AC_SL1500_.jpg",
+    ],
   },
   {
     id: 6,
@@ -271,7 +348,14 @@ export const productosEjemplo: Producto[] = [
       interfaz: "NVMe PCIe 3.0 x4",
       velocidadLectura: "3500 MB/s",
       velocidadEscritura: "3200 MB/s",
-      formato: "M.2 2280"
-    }
-  }
+      formato: "M.2 2280",
+    },
+    imagenPrincipal: "https://m.media-amazon.com/images/I/81y4MBgggQL._AC_SL1500_.jpg",
+    imagenesSecundarias: [
+      "https://m.media-amazon.com/images/I/71yAMHSGFIL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71N+GHEeaAL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71q8ASUCZBL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/81yc+Uw9BhL._AC_SL1500_.jpg",
+    ],
+  },
 ];

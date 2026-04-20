@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import type { ReactNode } from "react";
 import type { Producto } from "../types/producto";
 import { productosEjemplo } from "../data/productos";
 
@@ -9,12 +10,11 @@ interface ProductosContextType {
   eliminarProducto: (id: number) => void;
 }
 
-const ProductosContext = createContext<ProductosContextType | undefined>(undefined);
+export const ProductosContext = createContext<ProductosContextType | undefined>(undefined);
 
 const STORAGE_KEY = "productos_inventario";
 const IMAGES_KEY = "productos_imagenes";
 
-// Guardar imágenes por separado en localStorage
 const guardarImagenes = (productos: Producto[]) => {
   const mapa: Record<number, { principal?: string; secundarias?: string[] }> = {};
   productos.forEach(p => {
@@ -28,7 +28,7 @@ const guardarImagenes = (productos: Producto[]) => {
   try {
     localStorage.setItem(IMAGES_KEY, JSON.stringify(mapa));
   } catch {
-    // Si falla, ignorar (imágenes no persistidas)
+    // Si falla, ignorar
   }
 };
 
@@ -48,7 +48,6 @@ export const ProductosProvider = ({ children }: { children: ReactNode }) => {
       if (stored) {
         const prods: Producto[] = JSON.parse(stored);
         const imagenes = cargarImagenes();
-        // Reinyectar imágenes
         return prods.map(p => ({
           ...p,
           imagenPrincipal: imagenes[p.id]?.principal || p.imagenPrincipal,
@@ -63,14 +62,12 @@ export const ProductosProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     try {
-      // Guardar datos sin imágenes (para no superar cuota)
       const sinImagenes = productos.map(p => ({
         ...p,
         imagenPrincipal: undefined,
         imagenesSecundarias: undefined,
       }));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(sinImagenes));
-      // Guardar imágenes por separado
       guardarImagenes(productos);
     } catch (error) {
       console.error("Error al guardar productos:", error);
