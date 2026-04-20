@@ -323,7 +323,7 @@ const Vender = () => {
           transform: rotateY(0deg);
           color: white;
         }
-        /* DORSO (rotado, visible al hover) */
+        /* DORSO (rotado 180deg, visible al hover cuando el inner rota) */
         .vender-card-back {
           transform: rotateY(180deg);
           justify-content: center;
@@ -381,10 +381,7 @@ const Vender = () => {
           font-size: 0.62rem;
           color: #94a3b8;
         }
-        /* FRENTE (rotado al hover para mostrar dorso) */
-        .vender-card-front {
-          color: white;
-        }
+        /* FRENTE: contenido superpuesto */
         .vender-card-front-content {
           position: absolute;
           width: 100%;
