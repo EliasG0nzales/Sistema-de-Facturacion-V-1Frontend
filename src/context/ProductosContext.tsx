@@ -12,28 +12,68 @@ interface ProductosContextType {
 const ProductosContext = createContext<ProductosContextType | undefined>(undefined);
 
 const STORAGE_KEY = "productos_inventario";
+const IMAGES_KEY = "productos_imagenes";
+
+// Guardar imágenes por separado en localStorage
+const guardarImagenes = (productos: Producto[]) => {
+  const mapa: Record<number, { principal?: string; secundarias?: string[] }> = {};
+  productos.forEach(p => {
+    if (p.imagenPrincipal || (p.imagenesSecundarias && p.imagenesSecundarias.length > 0)) {
+      mapa[p.id] = {
+        principal: p.imagenPrincipal,
+        secundarias: p.imagenesSecundarias,
+      };
+    }
+  });
+  try {
+    localStorage.setItem(IMAGES_KEY, JSON.stringify(mapa));
+  } catch {
+    // Si falla, ignorar (imágenes no persistidas)
+  }
+};
+
+const cargarImagenes = (): Record<number, { principal?: string; secundarias?: string[] }> => {
+  try {
+    const stored = localStorage.getItem(IMAGES_KEY);
+    return stored ? JSON.parse(stored) : {};
+  } catch {
+    return {};
+  }
+};
 
 export const ProductosProvider = ({ children }: { children: ReactNode }) => {
-  // Inicializar desde localStorage o usar productos de ejemplo
   const [productos, setProductos] = useState<Producto[]>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        return JSON.parse(stored);
+        const prods: Producto[] = JSON.parse(stored);
+        const imagenes = cargarImagenes();
+        // Reinyectar imágenes
+        return prods.map(p => ({
+          ...p,
+          imagenPrincipal: imagenes[p.id]?.principal || p.imagenPrincipal,
+          imagenesSecundarias: imagenes[p.id]?.secundarias || p.imagenesSecundarias,
+        }));
       }
       return productosEjemplo;
-    } catch (error) {
-      console.error("Error al cargar productos desde localStorage:", error);
+    } catch {
       return productosEjemplo;
     }
   });
 
-  // Guardar en localStorage cada vez que cambien los productos
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(productos));
+      // Guardar datos sin imágenes (para no superar cuota)
+      const sinImagenes = productos.map(p => ({
+        ...p,
+        imagenPrincipal: undefined,
+        imagenesSecundarias: undefined,
+      }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sinImagenes));
+      // Guardar imágenes por separado
+      guardarImagenes(productos);
     } catch (error) {
-      console.error("Error al guardar productos en localStorage:", error);
+      console.error("Error al guardar productos:", error);
     }
   }, [productos]);
 

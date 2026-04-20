@@ -83,62 +83,29 @@ const CAT_ICONS: Record<string, ReactElement> = {
   ),
 };
 
-// Componente ProductoCard con rotación de imágenes
-const ProductoCard = ({ producto, imagenes, onAgregar, onVerDetalle }: {
+// Componente ProductoCard con flip: frente = imagen principal, dorso = 4 imágenes secundarias
+const ProductoCard = ({ producto, onAgregar, onVerDetalle }: {
   producto: Producto;
-  imagenes: string[];
   onAgregar: () => void;
   onVerDetalle: () => void;
 }) => {
-  const [imagenActual, setImagenActual] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
-
-  useEffect(() => {
-    if (!isHovered || imagenes.length <= 1) return;
-
-    const interval = setInterval(() => {
-      setImagenActual((prev) => (prev + 1) % imagenes.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [isHovered, imagenes.length]);
-
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-    if (imagenes.length > 1) {
-      setImagenActual(1); // Mostrar primera imagen secundaria
-    }
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    setImagenActual(0); // Volver a imagen principal
-  };
+  const imagenPrincipal = producto.imagenPrincipal;
+  const imagenesSecundarias = producto.imagenesSecundarias || [];
 
   return (
     <div
       className="vender-card"
       onClick={onAgregar}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
       title="Click para agregar al carrito"
     >
       <div className="vender-card-inner">
-        {/* FRENTE */}
+        {/* FRENTE: imagen principal (visible por defecto) */}
         <div className="vender-card-front">
-          {imagenes.length > 0 ? (
+          {imagenPrincipal ? (
             <img
-              src={imagenes[imagenActual]}
+              src={imagenPrincipal}
               alt={producto.nombre}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                position: "absolute",
-                top: 0,
-                left: 0,
-                transition: "opacity 0.5s ease",
-              }}
+              style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", top: 0, left: 0 }}
             />
           ) : (
             <div className="vender-card-img-bg">
@@ -150,24 +117,46 @@ const ProductoCard = ({ producto, imagenes, onAgregar, onVerDetalle }: {
           <div className="vender-card-front-content">
             <span className="vender-card-badge">{producto.categoria}</span>
             <div className="vender-card-desc">
-              <div className="vender-card-title-row">
-                <span>{producto.nombre}</span>
-              </div>
+              <div className="vender-card-title-row"><span>{producto.nombre}</span></div>
               <p className="vender-card-footer-text">
-                Stock: {producto.stock} &nbsp;|&nbsp; S/ {producto.precio.toFixed(2)}
+                {producto.stock} disponibles &nbsp;|&nbsp; S/ {producto.precio.toFixed(2)}
               </p>
             </div>
           </div>
         </div>
-        {/* DORSO */}
+
+        {/* DORSO: 4 imágenes secundarias en grid (visible al hover) */}
         <div className="vender-card-back">
           <div className="vender-card-back-content">
-            <svg stroke="#ffffff" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" height="40px" width="40px" fill="#ffffff">
-              <path d="M20.84375 0.03125C20.191406 0.0703125 19.652344 0.425781 19.21875 1.53125C18.988281 2.117188 18.5 3.558594 18.03125 4.9375C17.792969 5.636719 17.570313 6.273438 17.40625 6.75C17.390625 6.796875 17.414063 6.855469 17.40625 6.90625C17.398438 6.925781 17.351563 6.949219 17.34375 6.96875L17.25 7.25C18.566406 7.65625 19.539063 8.058594 19.625 8.09375C22.597656 9.21875 28.351563 11.847656 33.28125 16.78125C38.5 22 41.183594 28.265625 42.09375 30.71875C42.113281 30.761719 42.375 31.535156 42.75 32.84375C42.757813 32.839844 42.777344 32.847656 42.78125 32.84375C43.34375 32.664063 44.953125 32.09375 46.3125 31.625C47.109375 31.351563 47.808594 31.117188 48.15625 31C49.003906 30.714844 49.542969 30.292969 49.8125 29.6875C50.074219 29.109375 50.066406 28.429688 49.75 27.6875C49.605469 27.347656 49.441406 26.917969 49.25 26.4375C47.878906 23.007813 45.007813 15.882813 39.59375 10.46875C33.613281 4.484375 25.792969 1.210938 22.125 0.21875C21.648438 0.0898438 21.234375 0.0078125 20.84375 0.03125 Z M 16.46875 9.09375L0.0625 48.625C-0.09375 48.996094 -0.00390625 49.433594 0.28125 49.71875C0.472656 49.910156 0.738281 50 1 50C1.128906 50 1.253906 49.988281 1.375 49.9375L40.90625 33.59375C40.523438 32.242188 40.222656 31.449219 40.21875 31.4375C39.351563 29.089844 36.816406 23.128906 31.875 18.1875C27.035156 13.34375 21.167969 10.804688 18.875 9.9375C18.84375 9.925781 17.8125 9.5 16.46875 9.09375 Z M 17 16C19.761719 16 22 18.238281 22 21C22 23.761719 19.761719 26 17 26C15.140625 26 13.550781 24.972656 12.6875 23.46875L15.6875 16.1875C16.101563 16.074219 16.550781 16 17 16 Z M 31 22C32.65625 22 34 23.34375 34 25C34 25.917969 33.585938 26.730469 32.9375 27.28125L32.90625 27.28125C33.570313 27.996094 34 28.949219 34 30C34 32.210938 32.210938 34 30 34C27.789063 34 26 32.210938 26 30C26 28.359375 26.996094 26.960938 28.40625 26.34375L28.3125 26.3125C28.117188 25.917969 28 25.472656 28 25C28 23.34375 29.34375 22 31 22 Z M 21 32C23.210938 32 25 33.789063 25 36C25 36.855469 24.710938 37.660156 24.25 38.3125L20.3125 39.9375C18.429688 39.609375 17 37.976563 17 36C17 33.789063 18.789063 32 21 32 Z M 9 34C10.65625 34 12 35.34375 12 37C12 38.65625 10.65625 40 9 40C7.902344 40 6.960938 39.414063 6.4375 38.53125L8.25 34.09375C8.488281 34.03125 8.742188 34 9 34Z" />
-            </svg>
-            <strong>{producto.nombre}</strong>
-            <span className="vender-card-back-precio">S/ {producto.precio.toFixed(2)}</span>
-            <span className="vender-card-back-stock">{producto.stock} disponibles</span>
+            {imagenesSecundarias.length > 0 ? (
+              <>
+                <div className="vender-card-back-grid">
+                  {[0, 1, 2, 3].map((i) => (
+                    <div key={i} className="vender-card-back-cell">
+                      {imagenesSecundarias[i] ? (
+                        <img src={imagenesSecundarias[i]} alt={`${producto.nombre} ${i + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 6 }} />
+                      ) : (
+                        <div style={{ width: "100%", height: "100%", background: "#2a2a2a", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#555" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <strong style={{ fontSize: "0.72rem", color: "#fff", marginTop: 6 }}>{producto.nombre}</strong>
+                <span className="vender-card-back-precio">S/ {producto.precio.toFixed(2)}</span>
+                <span className="vender-card-back-stock">{producto.stock} disponibles</span>
+              </>
+            ) : (
+              <>
+                <svg stroke="#ffffff" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" height="40px" width="40px" fill="#ffffff">
+                  <path d="M20.84375 0.03125C20.191406 0.0703125 19.652344 0.425781 19.21875 1.53125C18.988281 2.117188 18.5 3.558594 18.03125 4.9375C17.792969 5.636719 17.570313 6.273438 17.40625 6.75C17.390625 6.796875 17.414063 6.855469 17.40625 6.90625C17.398438 6.925781 17.351563 6.949219 17.34375 6.96875L17.25 7.25C18.566406 7.65625 19.539063 8.058594 19.625 8.09375C22.597656 9.21875 28.351563 11.847656 33.28125 16.78125C38.5 22 41.183594 28.265625 42.09375 30.71875C42.113281 30.761719 42.375 31.535156 42.75 32.84375C42.757813 32.839844 42.777344 32.847656 42.78125 32.84375C43.34375 32.664063 44.953125 32.09375 46.3125 31.625C47.109375 31.351563 47.808594 31.117188 48.15625 31C49.003906 30.714844 49.542969 30.292969 49.8125 29.6875C50.074219 29.109375 50.066406 28.429688 49.75 27.6875C49.605469 27.347656 49.441406 26.917969 49.25 26.4375C47.878906 23.007813 45.007813 15.882813 39.59375 10.46875C33.613281 4.484375 25.792969 1.210938 22.125 0.21875C21.648438 0.0898438 21.234375 0.0078125 20.84375 0.03125 Z M 16.46875 9.09375L0.0625 48.625C-0.09375 48.996094 -0.00390625 49.433594 0.28125 49.71875C0.472656 49.910156 0.738281 50 1 50C1.128906 50 1.253906 49.988281 1.375 49.9375L40.90625 33.59375C40.523438 32.242188 40.222656 31.449219 40.21875 31.4375C39.351563 29.089844 36.816406 23.128906 31.875 18.1875C27.035156 13.34375 21.167969 10.804688 18.875 9.9375C18.84375 9.925781 17.8125 9.5 16.46875 9.09375 Z M 17 16C19.761719 16 22 18.238281 22 21C22 23.761719 19.761719 26 17 26C15.140625 26 13.550781 24.972656 12.6875 23.46875L15.6875 16.1875C16.101563 16.074219 16.550781 16 17 16 Z M 31 22C32.65625 22 34 23.34375 34 25C34 25.917969 33.585938 26.730469 32.9375 27.28125L32.90625 27.28125C33.570313 27.996094 34 28.949219 34 30C34 32.210938 32.210938 34 30 34C27.789063 34 26 32.210938 26 30C26 28.359375 26.996094 26.960938 28.40625 26.34375L28.3125 26.3125C28.117188 25.917969 28 25.472656 28 25C28 23.34375 29.34375 22 31 22 Z M 21 32C23.210938 32 25 33.789063 25 36C25 36.855469 24.710938 37.660156 24.25 38.3125L20.3125 39.9375C18.429688 39.609375 17 37.976563 17 36C17 33.789063 18.789063 32 21 32 Z M 9 34C10.65625 34 12 35.34375 12 37C12 38.65625 10.65625 40 9 40C7.902344 40 6.960938 39.414063 6.4375 38.53125L8.25 34.09375C8.488281 34.03125 8.742188 34 9 34Z" />
+                </svg>
+                <strong style={{ fontSize: "0.72rem" }}>{producto.nombre}</strong>
+                <span className="vender-card-back-precio">S/ {producto.precio.toFixed(2)}</span>
+                <span className="vender-card-back-stock">{producto.stock} disponibles</span>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -329,8 +318,14 @@ const Vender = () => {
           border-radius: 10px;
           overflow: hidden;
         }
-        /* DORSO (visible al hover) */
+        /* FRENTE (visible por defecto, sin rotación) */
+        .vender-card-front {
+          transform: rotateY(0deg);
+          color: white;
+        }
+        /* DORSO (rotado, visible al hover) */
         .vender-card-back {
+          transform: rotateY(180deg);
           justify-content: center;
           display: flex;
           align-items: center;
@@ -363,8 +358,19 @@ const Vender = () => {
           padding: 10px;
           text-align: center;
         }
-        .vender-card-back-content strong {
-          font-size: 0.72rem;
+        .vender-card-back-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          grid-template-rows: 1fr 1fr;
+          gap: 4px;
+          width: 80%;
+          aspect-ratio: 1/1;
+        }
+        .vender-card-back-cell {
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          border-radius: 6px;
         }
         .vender-card-back-precio {
           font-size: 0.78rem;
@@ -375,9 +381,8 @@ const Vender = () => {
           font-size: 0.62rem;
           color: #94a3b8;
         }
-        /* FRENTE (rotado, visible por defecto) */
+        /* FRENTE (rotado al hover para mostrar dorso) */
         .vender-card-front {
-          transform: rotateY(180deg);
           color: white;
         }
         .vender-card-front-content {
@@ -564,9 +569,9 @@ const Vender = () => {
           background: #fff;
           border-radius: 14px;
           width: 100%;
-          max-width: 850px;
-          max-height: 90vh;
-          overflow-y: auto;
+          max-width: 860px;
+          display: flex;
+          flex-direction: column;
           box-shadow: 0 20px 60px rgba(0,0,0,0.3);
           animation: modalIn 0.2s ease;
         }
@@ -575,7 +580,7 @@ const Vender = () => {
           to   { transform: scale(1); opacity: 1; }
         }
         .modal-header {
-          padding: 16px 20px;
+          padding: 14px 20px;
           border-bottom: 1px solid #e2e8f0;
           display: flex;
           justify-content: space-between;
@@ -583,17 +588,26 @@ const Vender = () => {
           font-weight: 600;
           font-size: 0.95rem;
           color: #1e293b;
+          flex-shrink: 0;
         }
         .modal-body {
-          padding: 24px;
+          padding: 20px 24px;
           display: flex;
           gap: 28px;
+          align-items: flex-start;
         }
-        .modal-img {
-          width: 360px;
-          min-width: 360px;
+        /* Columna izquierda: imagen principal + thumbnails */
+        .modal-left {
+          width: 420px;
+          min-width: 420px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .modal-img-main {
+          width: 100%;
           aspect-ratio: 1/1;
-          background: linear-gradient(135deg, #1e1e3a, #2d2d5e);
+          background: #f1f5f9;
           border-radius: 10px;
           display: flex;
           align-items: center;
@@ -601,12 +615,31 @@ const Vender = () => {
           font-size: 3rem;
           position: relative;
           overflow: hidden;
+          border: 1px solid #e2e8f0;
         }
-        .modal-img img {
+        .modal-img-main img {
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain;
         }
+        .modal-thumbnails {
+          display: flex;
+          gap: 6px;
+          width: 100%;
+        }
+        .modal-thumb {
+          flex: 1;
+          min-width: 0;
+          aspect-ratio: 1/1;
+          border-radius: 6px;
+          overflow: hidden;
+          border: 2px solid transparent;
+          cursor: pointer;
+          background: #f1f5f9;
+          transition: border-color 0.15s;
+        }
+        .modal-thumb.active { border-color: #2563eb; }
+        .modal-thumb img { width: 100%; height: 100%; object-fit: cover; }
         .carrusel-btn {
           position: absolute;
           top: 50%;
@@ -614,8 +647,8 @@ const Vender = () => {
           background: rgba(255,255,255,0.9);
           border: none;
           border-radius: 50%;
-          width: 36px;
-          height: 36px;
+          width: 32px;
+          height: 32px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -623,53 +656,85 @@ const Vender = () => {
           transition: background 0.2s;
           z-index: 10;
         }
-        .carrusel-btn:hover {
-          background: #fff;
-        }
-        .carrusel-btn-prev { left: 10px; }
-        .carrusel-btn-next { right: 10px; }
-        .carrusel-indicadores {
-          position: absolute;
-          bottom: 10px;
-          left: 50%;
-          transform: translateX(-50%);
+        .carrusel-btn:hover { background: #fff; }
+        .carrusel-btn-prev { left: 8px; }
+        .carrusel-btn-next { right: 8px; }
+        /* Columna derecha: info */
+        .modal-info {
+          flex: 1;
           display: flex;
-          gap: 8px;
+          flex-direction: column;
+          gap: 10px;
+          min-width: 0;
         }
-        .carrusel-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: rgba(255,255,255,0.5);
-          cursor: pointer;
-          transition: background 0.2s;
+        .modal-nombre {
+          font-size: 1.15rem;
+          font-weight: 800;
+          color: #0f172a;
+          line-height: 1.3;
         }
-        .carrusel-dot.active {
-          background: #fff;
+        .modal-precio-destacado {
+          font-size: 1.3rem;
+          font-weight: 800;
+          color: #e05a7a;
         }
-        .modal-info { flex: 1; }
-        .modal-nombre { font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
-        .modal-precio-box {
-          background: #eff6ff;
+        .modal-desc-lista {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+        .modal-desc-lista li {
+          font-size: 0.82rem;
+          color: #334155;
+          line-height: 1.5;
+          display: flex;
+          gap: 6px;
+          align-items: flex-start;
+        }
+        .modal-desc-lista li::before {
+          content: "•";
+          color: #2563eb;
+          font-weight: 700;
+          flex-shrink: 0;
+          margin-top: 1px;
+        }
+        .modal-specs-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 6px 12px;
+          background: #f8fafc;
           border-radius: 8px;
-          padding: 10px 14px;
-          margin-bottom: 12px;
-          font-size: 0.85rem;
+          padding: 10px 12px;
+          border: 1px solid #e2e8f0;
+        }
+        .modal-spec-item {
+          font-size: 0.78rem;
+          color: #475569;
+        }
+        .modal-spec-item span {
+          font-weight: 600;
           color: #1e293b;
         }
-        .modal-precio-box span { color: #2563eb; font-weight: 700; }
-        .modal-desc { 
-          font-size: 0.85rem; 
-          color: #475569; 
-          line-height: 1.65; 
-          margin-bottom: 16px;
-          text-align: justify;
+        .modal-stock-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: #dcfce7;
+          color: #16a34a;
+          font-size: 0.78rem;
+          font-weight: 600;
+          padding: 4px 10px;
+          border-radius: 20px;
         }
         .modal-footer {
-          padding: 16px 20px;
+          padding: 14px 20px;
           border-top: 1px solid #e2e8f0;
           display: flex;
           gap: 10px;
+          flex-shrink: 0;
         }
         .btn-agregar {
           flex: 1;
@@ -940,12 +1005,10 @@ const Vender = () => {
       <div style={{ flex: 1, overflowY: "auto", padding: "14px 20px", background: "#e8e8e8" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
           {productosFiltrados.map((p) => {
-            const todasImagenes = [p.imagenPrincipal, ...(p.imagenesSecundarias || [])].filter(Boolean);
             return (
               <ProductoCard
                 key={p.id}
                 producto={p}
-                imagenes={todasImagenes}
                 onAgregar={() => agregarAlCarrito(p)}
                 onVerDetalle={() => setProductoDetalle(p)}
               />
@@ -977,71 +1040,102 @@ const Vender = () => {
               <button onClick={() => { setProductoDetalle(null); setImagenActual(0); }} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#64748b" }}>✕</button>
             </div>
             <div className="modal-body">
-              <div className="modal-img">
-                {(() => {
-                  const imagenes = [
-                    productoDetalle.imagenPrincipal,
-                    ...(productoDetalle.imagenesSecundarias || [])
-                  ].filter(Boolean);
-                  
-                  const totalImagenes = imagenes.length;
-                  
-                  if (totalImagenes === 0) {
-                    return <span>🍕</span>;
-                  }
-                  
-                  return (
-                    <>
-                      <img src={imagenes[imagenActual]} alt={productoDetalle.nombre} />
-                      {totalImagenes > 1 && (
+              {/* Columna izquierda: imagen + thumbnails */}
+              {(() => {
+                const imagenes = [
+                  productoDetalle.imagenPrincipal,
+                  ...(productoDetalle.imagenesSecundarias || [])
+                ].filter(Boolean) as string[];
+                const totalImagenes = imagenes.length;
+                return (
+                  <div className="modal-left">
+                    <div className="modal-img-main">
+                      {totalImagenes === 0 ? (
+                        <span style={{ fontSize: "3rem" }}>🍕</span>
+                      ) : (
                         <>
-                          <button
-                            className="carrusel-btn carrusel-btn-prev"
-                            onClick={() => setImagenActual((prev) => (prev === 0 ? totalImagenes - 1 : prev - 1))}
-                          >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e293b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                              <polyline points="15 18 9 12 15 6" />
-                            </svg>
-                          </button>
-                          <button
-                            className="carrusel-btn carrusel-btn-next"
-                            onClick={() => setImagenActual((prev) => (prev === totalImagenes - 1 ? 0 : prev + 1))}
-                          >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e293b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                              <polyline points="9 18 15 12 9 6" />
-                            </svg>
-                          </button>
-                          <div className="carrusel-indicadores">
-                            {imagenes.map((_, i) => (
-                              <div
-                                key={i}
-                                className={`carrusel-dot ${i === imagenActual ? 'active' : ''}`}
-                                onClick={() => setImagenActual(i)}
-                              />
-                            ))}
-                          </div>
+                          <img src={imagenes[imagenActual]} alt={productoDetalle.nombre} />
+                          {totalImagenes > 1 && (
+                            <>
+                              <button className="carrusel-btn carrusel-btn-prev" onClick={() => setImagenActual((p) => (p === 0 ? totalImagenes - 1 : p - 1))}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1e293b" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+                              </button>
+                              <button className="carrusel-btn carrusel-btn-next" onClick={() => setImagenActual((p) => (p === totalImagenes - 1 ? 0 : p + 1))}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1e293b" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+                              </button>
+                            </>
+                          )}
                         </>
                       )}
-                    </>
-                  );
-                })()}
-              </div>
+                    </div>
+                    {/* Thumbnails */}
+                    {totalImagenes > 1 && (
+                      <div className="modal-thumbnails">
+                        {imagenes.map((img, i) => (
+                          <div key={i} className={`modal-thumb ${i === imagenActual ? "active" : ""}`} onClick={() => setImagenActual(i)}>
+                            <img src={img} alt={`thumb ${i}`} />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* Columna derecha: info */}
               <div className="modal-info">
-                <div className="modal-nombre">{productoDetalle.nombre}</div>
-                <div style={{ fontWeight: 700, fontSize: "0.88rem", color: "#1e293b", marginBottom: 8, marginTop: 4 }}>Descripción del Producto</div>
-                <div className="modal-desc">{productoDetalle.descripcion}</div>
-                <div className="modal-precio-box">
-                  Precio: <span>S/ {productoDetalle.precio.toFixed(2)}</span><br />
-                  Disponibilidad: <span style={{ color: "#16a34a" }}>{productoDetalle.stock} unidades en stock</span>
+                {/* Marca · Categoría · Stock juntos */}
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
+                  <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#e05a7a", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                    {productoDetalle.marca}
+                  </span>
+                  <span style={{ color: "#cbd5e1", fontSize: "0.7rem" }}>·</span>
+                  <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#e05a7a", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                    {productoDetalle.categoria}
+                  </span>
+                  <span style={{ color: "#cbd5e1", fontSize: "0.7rem" }}>·</span>
+                  <span className="modal-stock-badge">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    {productoDetalle.stock} en stock
+                  </span>
                 </div>
-                <div style={{ fontSize: "0.8rem", color: "#64748b", marginTop: 10 }}>Categoría: <span style={{ fontWeight: 600, color: "#1e293b" }}>{productoDetalle.categoria}</span></div>
+
+                {/* Nombre */}
+                <div className="modal-nombre">{productoDetalle.nombre}</div>
+                <div style={{ fontSize: "0.82rem", color: "#94a3b8", marginTop: 2, marginBottom: 12 }}>{productoDetalle.modelo}</div>
+
+                {/* Descripción */}
+                {productoDetalle.descripcion && (
+                  <p style={{ fontSize: "0.84rem", color: "#475569", lineHeight: 1.7, margin: 0, marginBottom: 16 }}>
+                    {productoDetalle.descripcion}
+                  </p>
+                )}
+
+                {/* Especificaciones */}
+                {Object.keys(productoDetalle.especificaciones).length > 0 && (
+                  <div className="modal-specs-grid" style={{ marginBottom: 16 }}>
+                    {Object.entries(productoDetalle.especificaciones).map(([k, v]) => (
+                      <div key={k} className="modal-spec-item">
+                        {k}: <span>{String(v)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Precio — bloque destacado */}
+                <div style={{
+                  background: "#fff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: 10,
+                  padding: "14px 18px",
+                }}>
+                  <div style={{ fontSize: "0.68rem", color: "#94a3b8", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 2 }}>Precio</div>
+                  <div style={{ fontSize: "1.5rem", fontWeight: 900, color: "#0f172a" }}>S/ {productoDetalle.precio.toFixed(2)}</div>
+                </div>
               </div>
             </div>
             <div className="modal-footer">
-              <button
-                className="btn-agregar"
-                onClick={() => { agregarAlCarrito(productoDetalle); setProductoDetalle(null); setImagenActual(0); }}
-              >
+              <button className="btn-agregar" onClick={() => { agregarAlCarrito(productoDetalle); setProductoDetalle(null); setImagenActual(0); }}>
                 Agregar al Carrito
               </button>
               <button className="btn-cerrar-modal" onClick={() => { setProductoDetalle(null); setImagenActual(0); }}>Cerrar</button>

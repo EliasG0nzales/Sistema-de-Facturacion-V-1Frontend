@@ -294,7 +294,6 @@ const Productos = () => {
                   <th>Modelo</th>
                   <th>Categoría</th>
                   <th>Precio</th>
-                  <th>Costo</th>
                   <th>Stock</th>
                   <th>Estado</th>
                 </tr>
@@ -310,7 +309,6 @@ const Productos = () => {
                       <td>{p.modelo}</td>
                       <td>{p.categoria}</td>
                       <td>S/ {p.precio.toFixed(2)}</td>
-                      <td style={{ color: "#64748b" }}>S/ {p.costo.toFixed(2)}</td>
                       <td>{p.stock}</td>
                       <td>
                         <span className={`stock-badge stock-${estado}`}>
