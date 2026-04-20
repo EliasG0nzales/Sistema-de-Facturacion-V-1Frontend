@@ -24,8 +24,7 @@ const Dashboard = () => {
   };
 
   const renderSection = () => {
-    // Si es admin y está en modo admin, mostrar panel de administración
-    if (isAdmin && modoAdmin) return <AdminPanel />;
+    if (isAdmin && modoAdmin) return <AdminPanel onVolverTienda={() => setModoAdmin(false)} />;
 
     switch (activeSection) {
       case "vender":    return <Vender />;
@@ -38,43 +37,43 @@ const Dashboard = () => {
     <ProductosProvider>
       <div style={{ display: "flex", height: "100vh", background: "#e0e0e0" }}>
 
-        {/* ── Sidebar ──────────────────────────────────────────────── */}
-        <aside style={{
-          width: 200,
-          background: "#d0d0d0",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "32px 20px 28px",
-          boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
-        }}>
+        {/* ── Sidebar — se oculta en modo admin ──────────────────── */}
+        {!modoAdmin && (
+          <aside style={{
+            width: 200,
+            background: "#d0d0d0",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            padding: "32px 20px 28px",
+            boxShadow: "2px 0 8px rgba(0,0,0,0.12)",
+          }}>
 
-          {/* Avatar */}
-          <div
-            style={{ width: 72, height: 72, borderRadius: "50%", background: "#aaa", marginBottom: 12, transition: "transform 0.3s ease, box-shadow 0.3s ease", boxShadow: "0 2px 8px rgba(0,0,0,0.15)", cursor: "default" }}
-            onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.08)")}
-            onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-          />
+            {/* Avatar */}
+            <div
+              style={{ width: 72, height: 72, borderRadius: "50%", background: "#aaa", marginBottom: 12, transition: "transform 0.3s ease, box-shadow 0.3s ease", boxShadow: "0 2px 8px rgba(0,0,0,0.15)", cursor: "default" }}
+              onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.08)")}
+              onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
+            />
 
-          <p style={{ fontSize: 13, fontWeight: 700, margin: "0 0 2px", color: "#222", textAlign: "center" }}>
-            {user?.username || "USER"}
-          </p>
-          <p style={{ fontSize: 12, color: "#555", margin: "0 0 4px", textAlign: "center" }}>Welcome back</p>
+            <p style={{ fontSize: 13, fontWeight: 700, margin: "0 0 2px", color: "#222", textAlign: "center" }}>
+              {user?.username || "USER"}
+            </p>
+            <p style={{ fontSize: 12, color: "#555", margin: "0 0 4px", textAlign: "center" }}>Welcome back</p>
 
-          {/* Badge de rol */}
-          {isAdmin && (
-            <span style={{
-              fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20,
-              background: modoAdmin ? "#dc2626" : "#2563eb",
-              color: "#fff", marginBottom: 20, textTransform: "uppercase", letterSpacing: "0.05em",
-            }}>
-              {modoAdmin ? "Modo Admin" : "Admin"}
-            </span>
-          )}
-          {!isAdmin && <div style={{ marginBottom: 20 }} />}
+            {/* Badge de rol */}
+            {isAdmin && (
+              <span style={{
+                fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20,
+                background: "#2563eb",
+                color: "#fff", marginBottom: 20, textTransform: "uppercase", letterSpacing: "0.05em",
+              }}>
+                Admin
+              </span>
+            )}
+            {!isAdmin && <div style={{ marginBottom: 20 }} />}
 
-          {/* Nav buttons — solo visible en modo usuario */}
-          {!modoAdmin && (
+            {/* Nav buttons */}
             <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 10 }}>
               {(["vender", "productos", "clientes"] as Section[]).map((sec) => (
                 <button
@@ -96,60 +95,60 @@ const Dashboard = () => {
                 </button>
               ))}
             </div>
-          )}
 
-          {/* Botón alternar modo admin/usuario — solo para admins */}
-          {isAdmin && (
-            <button
-              onClick={() => setModoAdmin(!modoAdmin)}
-              style={{
-                width: "100%", padding: "10px 0", borderRadius: 8, border: "none",
-                background: modoAdmin ? "#2563eb" : "#dc2626",
-                color: "#fff", fontWeight: 600, fontSize: 13, cursor: "pointer",
-                marginTop: modoAdmin ? 0 : 16,
-                transition: "background 0.2s",
-              }}
-            >
-              {modoAdmin ? "← Ver tienda" : "Panel Admin →"}
-            </button>
-          )}
-
-          {/* Bottom links */}
-          <div style={{ marginTop: "auto", width: "100%", display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
-            {["help", "settings"].map((item) => (
+            {/* Botón Panel Admin — solo para admins */}
+            {isAdmin && (
               <button
-                key={item}
+                onClick={() => setModoAdmin(true)}
+                style={{
+                  width: "100%", padding: "10px 0", borderRadius: 8, border: "none",
+                  background: "#dc2626",
+                  color: "#fff", fontWeight: 600, fontSize: 13, cursor: "pointer",
+                  marginTop: 16,
+                  transition: "background 0.2s",
+                }}
+              >
+                Panel Admin →
+              </button>
+            )}
+
+            {/* Bottom links */}
+            <div style={{ marginTop: "auto", width: "100%", display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
+              {["help", "settings"].map((item) => (
+                <button
+                  key={item}
+                  style={{
+                    background: "none", border: "none",
+                    color: hoverItem === item ? "#1144aa" : "#3366cc",
+                    fontSize: 13, cursor: "pointer", textAlign: "center",
+                    padding: "4px 0", width: "100%",
+                    transition: "color 0.2s ease, transform 0.15s ease",
+                    transform: hoverItem === item ? "scale(1.05)" : "scale(1)",
+                  }}
+                  onMouseEnter={() => setHoverItem(item)}
+                  onMouseLeave={() => setHoverItem(null)}
+                >
+                  {item}
+                </button>
+              ))}
+              <button
+                onClick={handleLogout}
                 style={{
                   background: "none", border: "none",
-                  color: hoverItem === item ? "#1144aa" : "#3366cc",
+                  color: hoverItem === "logout" ? "#1144aa" : "#3366cc",
                   fontSize: 13, cursor: "pointer", textAlign: "center",
                   padding: "4px 0", width: "100%",
                   transition: "color 0.2s ease, transform 0.15s ease",
-                  transform: hoverItem === item ? "scale(1.05)" : "scale(1)",
+                  transform: hoverItem === "logout" ? "scale(1.05)" : "scale(1)",
                 }}
-                onMouseEnter={() => setHoverItem(item)}
+                onMouseEnter={() => setHoverItem("logout")}
                 onMouseLeave={() => setHoverItem(null)}
               >
-                {item}
+                log out
               </button>
-            ))}
-            <button
-              onClick={handleLogout}
-              style={{
-                background: "none", border: "none",
-                color: hoverItem === "logout" ? "#1144aa" : "#3366cc",
-                fontSize: 13, cursor: "pointer", textAlign: "center",
-                padding: "4px 0", width: "100%",
-                transition: "color 0.2s ease, transform 0.15s ease",
-                transform: hoverItem === "logout" ? "scale(1.05)" : "scale(1)",
-              }}
-              onMouseEnter={() => setHoverItem("logout")}
-              onMouseLeave={() => setHoverItem(null)}
-            >
-              log out
-            </button>
-          </div>
-        </aside>
+            </div>
+          </aside>
+        )}
 
         {/* ── Main ─────────────────────────────────────────────────── */}
         <main style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>

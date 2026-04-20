@@ -35,13 +35,13 @@ export const productosEjemplo: Producto[] = [
       bahias: "2x 3.5 pulgadas, 2x 2.5 pulgadas",
       puertosUSB: "USB 3.1 Gen 1, USB-C",
     },
-    imagenPrincipal: "rmx750x.jpg",
+    imagenPrincipal: "https://m.media-amazon.com/images/I/61wQ-o6YBJL._AC_SL1500_.jpg",
     imagenesSecundarias: [
-      "/productos/rmx750x.jpg",
-      "/productos/rmx750x.jpg",
-      "/productos/rmx750x.jpg",
-      "/productos/rmx750x.jpg",
-    ]
+      "https://m.media-amazon.com/images/I/71pGEqvBqFL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71OQ5cGmrnL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/71z4zQHMoJL._AC_SL1500_.jpg",
+      "https://m.media-amazon.com/images/I/61UmGnIilJL._AC_SL1500_.jpg",
+    ],
   },
   {
     id: 10,

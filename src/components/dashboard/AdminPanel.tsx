@@ -74,7 +74,7 @@ const StatCard = ({ label, value, color }: { label: string; value: string | numb
 );
 
 // ── AdminPanel ─────────────────────────────────────────────────────────────
-const AdminPanel = () => {
+const AdminPanel = ({ onVolverTienda }: { onVolverTienda?: () => void }) => {
   const { productos, agregarProducto, eliminarProducto, actualizarProducto } = useProductos();
   const [section, setSection] = useState<AdminSection>("dashboard");
 
@@ -182,8 +182,7 @@ const AdminPanel = () => {
   };
 
   // ── Stats ──────────────────────────────────────────────────────────────
-  const totalStock     = productos.reduce((a, p) => a + p.stock, 0);
-  const sinStock       = productos.filter(p => p.stock === 0).length;
+  const sinStock        = productos.filter(p => p.stock === 0).length;
   const valorInventario = productos.reduce((a, p) => a + p.precio * p.stock, 0);
 
   const prodFiltrados  = productos.filter(p =>
@@ -209,7 +208,12 @@ const AdminPanel = () => {
       <aside style={{ width: 220, background: "#0f172a", display: "flex", flexDirection: "column", padding: "24px 16px", gap: 4, flexShrink: 0 }}>
         <div style={{ marginBottom: 24, paddingBottom: 16, borderBottom: "1px solid #1e293b" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#fff", fontWeight: 700 }}>A</div>
+            {/* ── LOGO ÁGUILA ── */}
+            <img
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQiBocmg0ZVPn-wZHzRpimfCLHYFPfrbdsmQQ&s"
+              alt="Eagle Admin"
+              style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+            />
             <div>
               <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#f1f5f9" }}>Eagle Admin</p>
               <p style={{ margin: 0, fontSize: 11, color: "#64748b" }}>Administrador</p>
@@ -235,7 +239,20 @@ const AdminPanel = () => {
           </button>
         ))}
 
-        <div style={{ marginTop: "auto", paddingTop: 16, borderTop: "1px solid #1e293b" }}>
+        <div style={{ marginTop: "auto", paddingTop: 16, borderTop: "1px solid #1e293b", display: "flex", flexDirection: "column", gap: 12 }}>
+          {onVolverTienda && (
+            <button
+              onClick={onVolverTienda}
+              style={{
+                width: "100%", padding: "10px 12px", borderRadius: 8, border: "none",
+                background: "#2563eb", color: "#fff",
+                fontSize: 13, fontWeight: 600, cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+              }}
+            >
+              ← Ver tienda
+            </button>
+          )}
           <div style={{ fontSize: 11, color: "#475569", textAlign: "center" }}>
             Panel de Administración<br />Eagle Gaming v1.0
           </div>
@@ -251,9 +268,9 @@ const AdminPanel = () => {
             <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: "#0f172a", textAlign: "left" }}>Resumen general</h2>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
-              <StatCard label="Total productos"     value={productos.length}             color="#2563eb" />
-              <StatCard label="Usuarios registrados" value={usuarios.length}             color="#16a34a" />
-              <StatCard label="Sin stock"            value={sinStock}                    color="#dc2626" />
+              <StatCard label="Total productos"      value={productos.length}                    color="#2563eb" />
+              <StatCard label="Usuarios registrados" value={usuarios.length}                     color="#16a34a" />
+              <StatCard label="Sin stock"            value={sinStock}                            color="#dc2626" />
               <StatCard label="Valor inventario"     value={`S/ ${valorInventario.toFixed(2)}`} color="#d97706" />
             </div>
 
@@ -270,7 +287,11 @@ const AdminPanel = () => {
                 </thead>
                 <tbody>
                   {productos.slice(0, 6).map(p => {
-                    const est = p.stock === 0 ? { label: "Sin stock", bg: "#fee2e2", color: "#dc2626" } : p.stock <= p.stockMinimo ? { label: "Stock bajo", bg: "#fef9c3", color: "#ca8a04" } : { label: "En stock", bg: "#dcfce7", color: "#16a34a" };
+                    const est = p.stock === 0
+                      ? { label: "Sin stock", bg: "#fee2e2", color: "#dc2626" }
+                      : p.stock <= p.stockMinimo
+                        ? { label: "Stock bajo", bg: "#fef9c3", color: "#ca8a04" }
+                        : { label: "En stock", bg: "#dcfce7", color: "#16a34a" };
                     return (
                       <tr key={p.id}>
                         <td style={{ padding: "8px 12px", borderBottom: "1px solid #f1f5f9", fontWeight: 600 }}>{p.nombre}</td>
@@ -331,16 +352,44 @@ const AdminPanel = () => {
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   <label style={labelCls}>Portada</label>
                   <input type="file" accept="image/*" id="adm-img-principal" style={{ display: "none" }} onChange={handleImgPrincipal} />
-                  <label htmlFor="adm-img-principal" style={{ width: "100%", aspectRatio: "1/1", background: formProd.imagenPrincipal ? `url(${formProd.imagenPrincipal}) center/cover` : "#e2e8f0", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "2px dashed #cbd5e1", overflow: "hidden" }}>
-                    {!formProd.imagenPrincipal && <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#94a3b8" strokeWidth="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>}
+                  <label
+                    htmlFor="adm-img-principal"
+                    style={{
+                      width: "100%", aspectRatio: "1/1",
+                      background: formProd.imagenPrincipal ? `url(${formProd.imagenPrincipal}) center/cover` : "#e2e8f0",
+                      borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center",
+                      cursor: "pointer", border: "2px dashed #cbd5e1", overflow: "hidden",
+                    }}
+                  >
+                    {!formProd.imagenPrincipal && (
+                      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#94a3b8" strokeWidth="1.5">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                      </svg>
+                    )}
                   </label>
                   <label style={labelCls}>Galería</label>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4 }}>
                     {[0,1,2,3].map(i => (
                       <div key={i}>
                         <input type="file" accept="image/*" id={`adm-img-sec-${i}`} style={{ display: "none" }} onChange={e => handleImgSecundaria(i, e)} />
-                        <label htmlFor={`adm-img-sec-${i}`} style={{ aspectRatio: "1/1", background: formProd.imagenesSecundarias[i] ? `url(${formProd.imagenesSecundarias[i]}) center/cover` : "#e2e8f0", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "1px dashed #cbd5e1", overflow: "hidden" }}>
-                          {!formProd.imagenesSecundarias[i] && <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#94a3b8" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>}
+                        <label
+                          htmlFor={`adm-img-sec-${i}`}
+                          style={{
+                            aspectRatio: "1/1",
+                            background: formProd.imagenesSecundarias[i] ? `url(${formProd.imagenesSecundarias[i]}) center/cover` : "#e2e8f0",
+                            borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center",
+                            cursor: "pointer", border: "1px dashed #cbd5e1", overflow: "hidden",
+                          }}
+                        >
+                          {!formProd.imagenesSecundarias[i] && (
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#94a3b8" strokeWidth="2">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                              <polyline points="7 10 12 15 17 10"/>
+                              <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                          )}
                         </label>
                       </div>
                     ))}
@@ -351,13 +400,20 @@ const AdminPanel = () => {
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {[
                     { label: "Nombre", name: "nombre", placeholder: "Nombre del producto" },
-                    { label: "Marca", name: "marca", placeholder: "Marca" },
+                    { label: "Marca",  name: "marca",  placeholder: "Marca" },
                     { label: "Modelo", name: "modelo", placeholder: "Modelo" },
                     { label: "Código", name: "codigo", placeholder: "Código" },
                   ].map(f => (
                     <div key={f.name}>
                       <label style={labelCls}>{f.label}</label>
-                      <input style={inputCls} name={f.name} value={(formProd as Record<string, string>)[f.name]} onChange={handleProdChange} placeholder={f.placeholder} required={["nombre","marca","modelo"].includes(f.name)} />
+                      <input
+                        style={inputCls}
+                        name={f.name}
+                        value={(formProd as Record<string, unknown>)[f.name] as string}
+                        onChange={handleProdChange}
+                        placeholder={f.placeholder}
+                        required={["nombre","marca","modelo"].includes(f.name)}
+                      />
                     </div>
                   ))}
                   <div>
@@ -368,7 +424,14 @@ const AdminPanel = () => {
                   </div>
                   <div>
                     <label style={labelCls}>Descripción</label>
-                    <textarea style={{ ...inputCls, resize: "vertical" }} name="descripcion" value={formProd.descripcion} onChange={handleProdChange} rows={3} placeholder="Descripción del producto" />
+                    <textarea
+                      style={{ ...inputCls, resize: "vertical" }}
+                      name="descripcion"
+                      value={formProd.descripcion}
+                      onChange={handleProdChange}
+                      rows={3}
+                      placeholder="Descripción del producto"
+                    />
                   </div>
                 </div>
 
@@ -376,13 +439,22 @@ const AdminPanel = () => {
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {[
                     { label: "Precio de venta (S/)", name: "precio" },
-                    { label: "Costo (S/)", name: "costo" },
-                    { label: "Stock actual", name: "stock" },
-                    { label: "Stock mínimo", name: "stockMinimo" },
+                    { label: "Costo (S/)",           name: "costo" },
+                    { label: "Stock actual",          name: "stock" },
+                    { label: "Stock mínimo",          name: "stockMinimo" },
                   ].map(f => (
                     <div key={f.name}>
                       <label style={labelCls}>{f.label}</label>
-                      <input style={inputCls} name={f.name} type="number" min="0" step={f.name.includes("precio") || f.name === "costo" ? "0.01" : "1"} value={(formProd as Record<string, string>)[f.name]} onChange={handleProdChange} placeholder="0" />
+                      <input
+                        style={inputCls}
+                        name={f.name}
+                        type="number"
+                        min="0"
+                        step={f.name.includes("precio") || f.name === "costo" ? "0.01" : "1"}
+                        value={(formProd as Record<string, unknown>)[f.name] as string}
+                        onChange={handleProdChange}
+                        placeholder="0"
+                      />
                     </div>
                   ))}
                   <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#475569", cursor: "pointer", textAlign: "left" }}>
@@ -394,7 +466,11 @@ const AdminPanel = () => {
                       {editandoId ? "Guardar cambios" : "Agregar producto"}
                     </button>
                     {editandoId && (
-                      <button type="button" onClick={() => { setEditandoId(null); setFormProd(EMPTY_PROD); }} style={{ padding: "9px 14px", background: "#f1f5f9", color: "#475569", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                      <button
+                        type="button"
+                        onClick={() => { setEditandoId(null); setFormProd(EMPTY_PROD); }}
+                        style={{ padding: "9px 14px", background: "#f1f5f9", color: "#475569", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+                      >
                         Cancelar
                       </button>
                     )}
@@ -407,7 +483,12 @@ const AdminPanel = () => {
             <div style={card}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                 <span style={{ fontWeight: 700, fontSize: 14, color: "#0f172a", textAlign: "left" }}>Todos los productos ({productos.length})</span>
-                <input style={{ ...inputCls, width: 220 }} placeholder="Buscar por nombre o código..." value={busqProd} onChange={e => setBusqProd(e.target.value)} />
+                <input
+                  style={{ ...inputCls, width: 220 }}
+                  placeholder="Buscar por nombre o código..."
+                  value={busqProd}
+                  onChange={e => setBusqProd(e.target.value)}
+                />
               </div>
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 800 }}>
@@ -420,7 +501,11 @@ const AdminPanel = () => {
                   </thead>
                   <tbody>
                     {prodFiltrados.map(p => {
-                      const est = p.stock === 0 ? { label: "Sin stock", bg: "#fee2e2", color: "#dc2626" } : p.stock <= p.stockMinimo ? { label: "Stock bajo", bg: "#fef9c3", color: "#ca8a04" } : { label: "En stock", bg: "#dcfce7", color: "#16a34a" };
+                      const est = p.stock === 0
+                        ? { label: "Sin stock", bg: "#fee2e2", color: "#dc2626" }
+                        : p.stock <= p.stockMinimo
+                          ? { label: "Stock bajo", bg: "#fef9c3", color: "#ca8a04" }
+                          : { label: "En stock", bg: "#dcfce7", color: "#16a34a" };
                       return (
                         <tr key={p.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
                           <td style={{ padding: "8px 12px" }}>
@@ -430,7 +515,9 @@ const AdminPanel = () => {
                             }
                           </td>
                           <td style={{ padding: "8px 12px", color: "#64748b", fontFamily: "monospace" }}>{p.codigo}</td>
-                          <td style={{ padding: "8px 12px", fontWeight: 600 }}>{p.nombre}{p.destacado && <span style={{ marginLeft: 5, color: "#f59e0b" }}>★</span>}</td>
+                          <td style={{ padding: "8px 12px", fontWeight: 600 }}>
+                            {p.nombre}{p.destacado && <span style={{ marginLeft: 5, color: "#f59e0b" }}>★</span>}
+                          </td>
                           <td style={{ padding: "8px 12px", color: "#64748b" }}>{p.categoria}</td>
                           <td style={{ padding: "8px 12px" }}>S/ {p.precio.toFixed(2)}</td>
                           <td style={{ padding: "8px 12px", color: "#64748b" }}>S/ {p.costo.toFixed(2)}</td>
@@ -440,7 +527,12 @@ const AdminPanel = () => {
                           </td>
                           <td style={{ padding: "8px 12px" }}>
                             <div style={{ display: "flex", gap: 6 }}>
-                              <button onClick={() => handleEditar(p)} style={{ padding: "5px 10px", background: "#eff6ff", color: "#2563eb", border: "none", borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Editar</button>
+                              <button
+                                onClick={() => handleEditar(p)}
+                                style={{ padding: "5px 10px", background: "#eff6ff", color: "#2563eb", border: "none", borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+                              >
+                                Editar
+                              </button>
                               <button onClick={() => setConfirmDel(p.id)} style={btnDanger}>Eliminar</button>
                             </div>
                           </td>
@@ -461,7 +553,12 @@ const AdminPanel = () => {
             <div style={card}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                 <span style={{ fontSize: 14, fontWeight: 700, color: "#0f172a" }}>Total: {usuarios.length} usuarios</span>
-                <input style={{ ...inputCls, width: 240 }} placeholder="Buscar por nombre o email..." value={busqUser} onChange={e => setBusqUser(e.target.value)} />
+                <input
+                  style={{ ...inputCls, width: 240 }}
+                  placeholder="Buscar por nombre o email..."
+                  value={busqUser}
+                  onChange={e => setBusqUser(e.target.value)}
+                />
               </div>
               {usersFiltrados.length === 0 ? (
                 <p style={{ color: "#94a3b8", textAlign: "center", padding: "30px 0", fontSize: 14 }}>No hay usuarios registrados.</p>
@@ -502,8 +599,20 @@ const AdminPanel = () => {
             <div style={{ ...card, maxWidth: 500 }}>
               <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "#0f172a", textAlign: "left" }}>Nombre del negocio</h3>
               <label style={labelCls}>Nombre que verán los usuarios</label>
-              <input style={{ ...inputCls, marginBottom: 12 }} value={storeName} onChange={e => setStoreName(e.target.value)} placeholder="Eagle Gaming" />
-              <button style={btnPrimary} onClick={() => { localStorage.setItem("eagle_store_name", storeName); setStoreMsg("¡Guardado correctamente!"); setTimeout(() => setStoreMsg(""), 2500); }}>
+              <input
+                style={{ ...inputCls, marginBottom: 12 }}
+                value={storeName}
+                onChange={e => setStoreName(e.target.value)}
+                placeholder="Eagle Gaming"
+              />
+              <button
+                style={btnPrimary}
+                onClick={() => {
+                  localStorage.setItem("eagle_store_name", storeName);
+                  setStoreMsg("¡Guardado correctamente!");
+                  setTimeout(() => setStoreMsg(""), 2500);
+                }}
+              >
                 Guardar cambios
               </button>
               {storeMsg && <p style={{ color: "#16a34a", fontSize: 13, marginTop: 8 }}>{storeMsg}</p>}
@@ -512,7 +621,8 @@ const AdminPanel = () => {
             <div style={{ ...card, maxWidth: 500 }}>
               <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "#0f172a", textAlign: "left" }}>Credenciales de acceso admin</h3>
               <p style={{ fontSize: 13, color: "#64748b", margin: "0 0 8px", textAlign: "left" }}>
-                Las credenciales de administrador se gestionan desde el archivo <code style={{ background: "#f1f5f9", padding: "2px 6px", borderRadius: 4 }}>.env</code> del proyecto.
+                Las credenciales de administrador se gestionan desde el archivo{" "}
+                <code style={{ background: "#f1f5f9", padding: "2px 6px", borderRadius: 4 }}>.env</code> del proyecto.
               </p>
               <div style={{ background: "#f8fafc", borderRadius: 8, padding: "12px 14px", fontSize: 12, color: "#475569", fontFamily: "monospace", textAlign: "left" }}>
                 VITE_ADMIN_EMAIL=eaglegamer147@gmail.com<br />
@@ -523,7 +633,15 @@ const AdminPanel = () => {
             <div style={{ ...card, maxWidth: 500 }}>
               <h3 style={{ margin: "0 0 12px", fontSize: 15, fontWeight: 700, color: "#dc2626", textAlign: "left" }}>Zona de peligro</h3>
               <p style={{ fontSize: 13, color: "#64748b", margin: "0 0 12px", textAlign: "left" }}>Eliminar todos los usuarios registrados del sistema.</p>
-              <button style={{ ...btnDanger, padding: "9px 18px" }} onClick={() => { if (confirm("¿Eliminar TODOS los usuarios? Esta acción no se puede deshacer.")) { localStorage.removeItem("eagle_users"); setUsuarios([]); } }}>
+              <button
+                style={{ ...btnDanger, padding: "9px 18px" }}
+                onClick={() => {
+                  if (confirm("¿Eliminar TODOS los usuarios? Esta acción no se puede deshacer.")) {
+                    localStorage.removeItem("eagle_users");
+                    setUsuarios([]);
+                  }
+                }}
+              >
                 Eliminar todos los usuarios
               </button>
             </div>
@@ -538,8 +656,18 @@ const AdminPanel = () => {
             <p style={{ fontWeight: 700, fontSize: 15, color: "#0f172a", margin: "0 0 8px", textAlign: "left" }}>¿Eliminar producto?</p>
             <p style={{ fontSize: 13, color: "#64748b", margin: "0 0 20px", textAlign: "left" }}>Esta acción no se puede deshacer.</p>
             <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => { eliminarProducto(confirmDel); setConfirmDel(null); }} style={{ flex: 1, padding: "9px", background: "#dc2626", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, cursor: "pointer", fontSize: 13 }}>Eliminar</button>
-              <button onClick={() => setConfirmDel(null)} style={{ flex: 1, padding: "9px", background: "#f1f5f9", color: "#475569", border: "none", borderRadius: 8, fontWeight: 600, cursor: "pointer", fontSize: 13 }}>Cancelar</button>
+              <button
+                onClick={() => { eliminarProducto(confirmDel); setConfirmDel(null); }}
+                style={{ flex: 1, padding: "9px", background: "#dc2626", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, cursor: "pointer", fontSize: 13 }}
+              >
+                Eliminar
+              </button>
+              <button
+                onClick={() => setConfirmDel(null)}
+                style={{ flex: 1, padding: "9px", background: "#f1f5f9", color: "#475569", border: "none", borderRadius: 8, fontWeight: 600, cursor: "pointer", fontSize: 13 }}
+              >
+                Cancelar
+              </button>
             </div>
           </div>
         </div>
@@ -553,8 +681,18 @@ const AdminPanel = () => {
             <p style={{ fontSize: 13, color: "#2563eb", margin: "0 0 4px", textAlign: "left" }}>{confirmDelUser}</p>
             <p style={{ fontSize: 13, color: "#64748b", margin: "0 0 20px", textAlign: "left" }}>Esta acción no se puede deshacer.</p>
             <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => eliminarUsuario(confirmDelUser)} style={{ flex: 1, padding: "9px", background: "#dc2626", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, cursor: "pointer", fontSize: 13 }}>Eliminar</button>
-              <button onClick={() => setConfirmDelUser(null)} style={{ flex: 1, padding: "9px", background: "#f1f5f9", color: "#475569", border: "none", borderRadius: 8, fontWeight: 600, cursor: "pointer", fontSize: 13 }}>Cancelar</button>
+              <button
+                onClick={() => eliminarUsuario(confirmDelUser)}
+                style={{ flex: 1, padding: "9px", background: "#dc2626", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, cursor: "pointer", fontSize: 13 }}
+              >
+                Eliminar
+              </button>
+              <button
+                onClick={() => setConfirmDelUser(null)}
+                style={{ flex: 1, padding: "9px", background: "#f1f5f9", color: "#475569", border: "none", borderRadius: 8, fontWeight: 600, cursor: "pointer", fontSize: 13 }}
+              >
+                Cancelar
+              </button>
             </div>
           </div>
         </div>
