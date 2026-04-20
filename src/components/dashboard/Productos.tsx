@@ -10,9 +10,10 @@ const EMPTY_FORM = {
 };
 
 const Productos = () => {
-  const { productos, agregarProducto } = useProductos();
+  const { productos, agregarProducto, eliminarProducto } = useProductos();
   const [form, setForm] = useState(EMPTY_FORM);
   const [busqueda, setBusqueda] = useState("");
+  const [confirmEliminar, setConfirmEliminar] = useState<number | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -50,7 +51,7 @@ const Productos = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const nuevo: Producto = {
+    const datos: Producto = {
       id: Date.now(),
       nombre: form.nombre,
       marca: form.marca,
@@ -67,7 +68,7 @@ const Productos = () => {
       imagenPrincipal: form.imagenPrincipal,
       imagenesSecundarias: form.imagenesSecundarias.filter(img => img !== ""),
     };
-    agregarProducto(nuevo);
+    agregarProducto(datos);
     setForm(EMPTY_FORM);
   };
 
@@ -104,6 +105,14 @@ const Productos = () => {
         .stock-ok { background: #dcfce7; color: #16a34a; }
         .stock-low { background: #fef9c3; color: #ca8a04; }
         .stock-out { background: #fee2e2; color: #dc2626; }
+        .btn-accion {
+          border: none; border-radius: 6px; width: 28px; height: 28px;
+          display: inline-flex; align-items: center; justify-content: center;
+          cursor: pointer; transition: opacity 0.15s;
+        }
+        .btn-accion:hover { opacity: 0.75; }
+        .btn-editar { background: #eff6ff; }
+        .btn-eliminar { background: #fee2e2; }
       `}</style>
 
       {/* Header */}
@@ -296,6 +305,7 @@ const Productos = () => {
                   <th>Precio</th>
                   <th>Stock</th>
                   <th>Estado</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -315,6 +325,16 @@ const Productos = () => {
                           {estado === "ok" ? "En stock" : estado === "low" ? "Stock bajo" : "Sin stock"}
                         </span>
                       </td>
+                      <td>
+                        <div style={{ display: "flex", gap: 6, justifyContent: "center" }}>
+                          <button className="btn-accion btn-eliminar" onClick={() => setConfirmEliminar(p.id)} title="Eliminar">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                              <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   );
                 })}
@@ -323,6 +343,26 @@ const Productos = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal confirmar eliminación */}
+      {confirmEliminar !== null && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: "#fff", borderRadius: 12, padding: 24, width: 320, boxShadow: "0 10px 40px rgba(0,0,0,0.2)" }}>
+            <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "#0f172a", marginBottom: 8 }}>¿Eliminar producto?</div>
+            <div style={{ fontSize: "0.82rem", color: "#64748b", marginBottom: 20 }}>Esta acción no se puede deshacer.</div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={() => { eliminarProducto(confirmEliminar); setConfirmEliminar(null); }}
+                style={{ flex: 1, padding: "9px", background: "#dc2626", color: "#fff", border: "none", borderRadius: 8, fontWeight: 700, cursor: "pointer", fontSize: "0.82rem" }}>
+                Eliminar
+              </button>
+              <button onClick={() => setConfirmEliminar(null)}
+                style={{ flex: 1, padding: "9px", background: "#f1f5f9", color: "#475569", border: "none", borderRadius: 8, fontWeight: 600, cursor: "pointer", fontSize: "0.82rem" }}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

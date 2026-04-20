@@ -352,18 +352,18 @@ const Vender = () => {
           color: white;
           display: flex;
           flex-direction: column;
-          justify-content: center;
+          justify-content: flex-end;
           align-items: center;
-          gap: 10px;
-          padding: 10px;
+          gap: 3px;
+          padding: 8px;
           text-align: center;
         }
         .vender-card-back-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
           grid-template-rows: 1fr 1fr;
-          gap: 4px;
-          width: 80%;
+          gap: 3px;
+          width: 55%;
           aspect-ratio: 1/1;
         }
         .vender-card-back-cell {
