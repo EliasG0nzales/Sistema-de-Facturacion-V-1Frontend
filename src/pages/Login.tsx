@@ -44,13 +44,47 @@ const Login = () => {
       overflow: "hidden",
     }}>
 
-      ```typescriptreact
-{/* Video de fondo */}
+      <style>{`
+  @keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  .metallic-text {
+    background: linear-gradient(
+      90deg,
+      #6e6e6e 0%,
+      #c0c0c0 20%,
+      #ffffff 40%,
+      #c0c0c0 60%,
+      #6e6e6e 80%,
+      #c0c0c0 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 8s linear infinite;
+  }
+  .metallic-soft {
+    background: linear-gradient(
+      90deg,
+      #888 0%,
+      #d0d0d0 25%,
+      #f0f0f0 50%,
+      #d0d0d0 75%,
+      #888 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 10s linear infinite;
+  }
+`}</style>
+
+      {/* Video de fondo */}
       <video
-        autoPlay
-        loop
-        muted
-        playsInline
+        autoPlay loop muted playsInline
         style={{
           position: "absolute",
           top: 0, left: 0,
@@ -61,9 +95,8 @@ const Login = () => {
       >
         <source src="/gamer.mp4" type="video/mp4" />
       </video>
-```
 
-      {/* Overlay oscuro */}
+      {/* Overlay */}
       <div style={{
         position: "absolute",
         top: 0, left: 0,
@@ -80,31 +113,35 @@ const Login = () => {
         justifyContent: "center",
         alignItems: "flex-start",
         padding: "0 60px",
-        color: "#fff",
         position: "relative",
         zIndex: 2,
       }}>
-        <h1 style={{
-          fontSize: 36,
-          fontWeight: 800,
-          fontFamily: "'Orbitron', sans-serif",
-          lineHeight: 1.6,
-          color: "#fff",
-          textAlign: "left",
-          textShadow: "none",
-        }}>
+        <h1
+          className="metallic-text"
+          style={{
+            fontSize: 52,
+            fontWeight: 800,
+            fontFamily: "'Orbitron', sans-serif",
+            lineHeight: 1.4,
+            textAlign: "left",
+            margin: "0 0 20px",
+          }}
+        >
           Bienvenido<br />a EAGLE GAMING
         </h1>
 
-        <p style={{
-          fontSize: 15,
-          fontFamily: "'Roboto', sans-serif",
-          fontWeight: 600,
-          maxWidth: 380,
-          opacity: 0.9,
-          lineHeight: 1.6,
-          textAlign: "left",
-        }}>
+        <p
+          className="metallic-soft"
+          style={{
+            fontSize: 18,
+            fontFamily: "'Roboto', sans-serif",
+            fontWeight: 600,
+            maxWidth: 480,
+            lineHeight: 1.8,
+            textAlign: "left",
+            margin: 0,
+          }}
+        >
           Eagle Gaming es tu plataforma de gestión para negocios de videojuegos y tecnología.
           Administra ventas, productos y clientes desde un solo lugar, rápido y sin complicaciones.
         </p>
@@ -123,10 +160,17 @@ const Login = () => {
         zIndex: 2,
       }}>
         <div style={{ width: "100%" }}>
-          <h2 style={{
-            color: "#fff", textAlign: "center",
-            fontSize: 28, fontWeight: 600, marginBottom: 28,
-          }}>
+
+          <h2
+            className="metallic-text"
+            style={{
+              textAlign: "center",
+              fontSize: 28,
+              fontWeight: 600,
+              marginBottom: 28,
+              fontFamily: "'Orbitron', sans-serif",
+            }}
+          >
             Iniciar sesión
           </h2>
 
@@ -137,9 +181,13 @@ const Login = () => {
           )}
 
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
             {/* Email */}
             <div>
-              <label style={{ color: "#fff", fontSize: 14, display: "block", marginBottom: 6 }}>
+              <label
+                className="metallic-soft"
+                style={{ fontSize: 14, display: "block", marginBottom: 6, fontWeight: 600 }}
+              >
                 Correo electrónico
               </label>
               <input
@@ -160,9 +208,12 @@ const Login = () => {
               />
             </div>
 
-            {/* Contraseña con ojito */}
+            {/* Contraseña */}
             <div>
-              <label style={{ color: "#fff", fontSize: 14, display: "block", marginBottom: 6 }}>
+              <label
+                className="metallic-soft"
+                style={{ fontSize: 14, display: "block", marginBottom: 6, fontWeight: 600 }}
+              >
                 Contraseña
               </label>
               <div style={{ position: "relative" }}>
@@ -186,15 +237,10 @@ const Login = () => {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   style={{
-                    position: "absolute",
-                    right: 12,
-                    top: "50%",
+                    position: "absolute", right: 12, top: "50%",
                     transform: "translateY(-50%)",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: 0,
-                    lineHeight: 1,
+                    background: "none", border: "none",
+                    cursor: "pointer", padding: 0, lineHeight: 1,
                   }}
                 >
                   {showPassword ? (
@@ -221,7 +267,11 @@ const Login = () => {
                 checked={remember}
                 onChange={(e) => setRemember(e.target.checked)}
               />
-              <label htmlFor="remember" style={{ color: "#fff", fontSize: 13 }}>
+              <label
+                htmlFor="remember"
+                className="metallic-soft"
+                style={{ fontSize: 13, fontWeight: 600 }}
+              >
                 Recuérdame
               </label>
             </div>
@@ -245,17 +295,24 @@ const Login = () => {
           </form>
 
           <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 6 }}>
-            <Link to="/forgot-password" style={{ color: "#fff", fontSize: 13, textDecoration: "none", opacity: 0.85 }}>
+            <Link
+              to="/forgot-password"
+              style={{ color: "#fff", fontSize: 13, textDecoration: "none", opacity: 0.85 }}
+            >
               ¿Olvidaste tu contraseña?
             </Link>
             <div>
               <span style={{ color: "#fff", fontSize: 13, fontWeight: 700 }}>Regístrate</span>
               <br />
-              <Link to="/register" style={{ color: "#fff", fontSize: 13, textDecoration: "none", opacity: 0.85 }}>
+              <Link
+                to="/register"
+                style={{ color: "#fff", fontSize: 13, textDecoration: "none", opacity: 0.85 }}
+              >
                 Crear cuenta nueva
               </Link>
             </div>
           </div>
+
         </div>
       </div>
     </div>
