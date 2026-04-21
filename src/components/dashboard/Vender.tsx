@@ -136,23 +136,15 @@ const ProductoCard = ({ producto, onAgregar, onVerDetalle }: {
               <>
                 <div className="vender-card-back-grid">
                   {[0, 1, 2, 3].map((i) => (
-                    <div key={i} className="vender-card-back-cell">
-                      {imagenesSecundarias[i] ? (
+                    imagenesSecundarias[i] ? (
+                      <div key={i} className="vender-card-back-cell">
                         <img
                           src={imagenesSecundarias[i]}
                           alt={`${producto.nombre} ${i + 1}`}
                           style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 6 }}
                         />
-                      ) : (
-                        <div style={{ width: "100%", height: "100%", background: "#2a2a2a", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#555" strokeWidth="1.5">
-                            <rect x="3" y="3" width="18" height="18" rx="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21 15 16 10 5 21"/>
-                          </svg>
-                        </div>
-                      )}
-                    </div>
+                      </div>
+                    ) : null
                   ))}
                 </div>
                 <strong className="vender-card-back-nombre">{producto.nombre}</strong>
@@ -276,6 +268,12 @@ const Vender = () => {
         /* ══════════════════════════════════════════════
            FLIP CARD — estructura base
         ══════════════════════════════════════════════ */
+        @keyframes rgb-border {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
         .vender-card {
           width: 100%;
           aspect-ratio: 1 / 1;
@@ -283,14 +281,17 @@ const Vender = () => {
           position: relative;
           cursor: pointer;
           overflow: visible;
+          border-radius: 12px;
         }
+
         .vender-card-inner {
           width: 100%;
           height: 100%;
           transform-style: preserve-3d;
           transition: transform 320ms ease;
-          box-shadow: 0 4px 18px rgba(0,0,0,0.5);
           border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 4px 18px rgba(0,0,0,0.5);
         }
         .vender-card:hover .vender-card-inner {
           transform: rotateY(180deg);
@@ -326,6 +327,26 @@ const Vender = () => {
           overflow: hidden;
           position: relative;
           background: #1a1a1a;
+        }
+        /* Borde RGB animado solo en la zona de imagen */
+        .vender-card-img-wrap::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 0;
+          padding: 2px;
+          background: linear-gradient(
+            270deg,
+            #ff0000, #ff7700, #ffff00, #00ff00,
+            #00ffff, #0000ff, #8b00ff, #ff00ff, #ff0000
+          );
+          background-size: 400% 400%;
+          animation: rgb-border 4s linear infinite;
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          pointer-events: none;
+          z-index: 3;
         }
         .vender-card-img {
           width: 100%;
@@ -680,7 +701,7 @@ const Vender = () => {
         .filtro-grupo { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; }
         .filtro-grupo:last-child { border-bottom: none; }
         .filtro-titulo {
-          font-size: 0.78rem; font-weight: 600; color: #475569;
+          font-size: 0.78rem; font-weight: 600; color: #c0392b;
           margin-bottom: 8px; text-transform: capitalize;
         }
         .filtro-opciones { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -690,10 +711,10 @@ const Vender = () => {
           font-size: 0.72rem; cursor: pointer;
           transition: all 0.2s; color: #1e293b;
         }
-        .filtro-chip:hover { border-color: #e05a7a; }
+        .filtro-chip:hover { border-color: #c0392b; color: #c0392b; }
         .filtro-chip.active {
-          border-color: #e05a7a; font-weight: 600;
-          box-shadow: 0 0 0 2px rgba(224,90,122,0.2);
+          border-color: #c0392b; background: #fef2f2;
+          color: #c0392b; font-weight: 600;
         }
         .filtros-vacio {
           padding: 24px 16px; text-align: center;
@@ -702,42 +723,42 @@ const Vender = () => {
       `}</style>
 
       {/* ── Header ───────────────────────────────────────────────── */}
-      <div style={{ background: "#888", padding: "10px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h2 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: "#fff" }}>Vender</h2>
-        <button style={{ padding: "6px 16px", borderRadius: 20, border: "1px solid #bbb", background: "#aaa", color: "#fff", fontSize: 13, cursor: "pointer" }}>
+      <div style={{ background: "linear-gradient(135deg, #c0392b, #e74c3c)", padding: "10px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #e74c3c" }}>
+        <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#fff", letterSpacing: 1 }}>Vender</h2>
+        <button style={{ padding: "6px 16px", borderRadius: 20, border: "1px solid #c0392b", background: "linear-gradient(135deg, #c0392b, #e74c3c)", color: "#fff", fontSize: 13, cursor: "pointer", fontWeight: 600 }}>
           Historial de ventas
         </button>
       </div>
 
       {/* ── Buscador + controles ─────────────────────────────────── */}
-      <div style={{ background: "#d0d0d0", padding: "10px 20px", display: "flex", gap: 10, alignItems: "center" }}>
+      <div style={{ background: "#fff", padding: "10px 20px", display: "flex", gap: 10, alignItems: "center", borderBottom: "1px solid #e2e8f0" }}>
         <input
           type="text"
           placeholder="Buscar producto..."
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
-          style={{ flex: 1, padding: "7px 14px", borderRadius: 20, border: "1px solid #bbb", fontSize: 13, outline: "none" }}
+          style={{ flex: 1, padding: "7px 14px", borderRadius: 20, border: "1px solid #e2e8f0", fontSize: 13, outline: "none", background: "#f8fafc", color: "#1e293b" }}
         />
 
         {/* Categorías */}
         <div style={{ position: "relative" }}>
           <button
             onClick={() => { setDropdownAbierto(v => !v); setFiltrosAbiertos(false); }}
-            style={{ padding: "7px 14px", borderRadius: 20, border: "1px solid #bbb", fontSize: 13, outline: "none", cursor: "pointer", background: "#fff", color: "#333", display: "flex", alignItems: "center", gap: 8, minWidth: 140, justifyContent: "space-between" }}
+            style={{ padding: "7px 14px", borderRadius: 20, border: "1px solid #e2e8f0", fontSize: 13, outline: "none", cursor: "pointer", background: "#fff", color: "#1e293b", display: "flex", alignItems: "center", gap: 8, minWidth: 140, justifyContent: "space-between" }}
           >
             <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
               {CAT_ICONS[categoriaFiltro]}
               {categoriaFiltro === "todas" ? "Categorías" : categoriaFiltro}
             </span>
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#666" strokeWidth="2.5" strokeLinecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#ccc" strokeWidth="2.5" strokeLinecap="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           {dropdownAbierto && (
-            <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: "#fff", border: "1px solid #e2e8f0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 50, minWidth: 200, overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: "#fff", border: "1px solid #e2e8f0", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.1)", zIndex: 50, minWidth: 200, overflow: "hidden" }}>
               {categorias.map((c) => (
                 <button
                   key={c}
                   onClick={() => { setCategoriaFiltro(c); setDropdownAbierto(false); limpiarFiltros(); }}
-                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", background: categoriaFiltro === c ? "#fff0f4" : "transparent", border: "none", borderBottom: "1px solid #f1f5f9", cursor: "pointer", fontSize: 13, color: "#1e293b", textAlign: "left" }}
+                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", background: categoriaFiltro === c ? "#fef2f2" : "transparent", border: "none", borderBottom: "1px solid #f1f5f9", cursor: "pointer", fontSize: 13, color: "#1e293b", textAlign: "left" }}
                 >
                   {CAT_ICONS[c]}
                   <span style={{ fontWeight: categoriaFiltro === c ? 700 : 400 }}>
@@ -753,7 +774,7 @@ const Vender = () => {
         <div style={{ position: "relative" }}>
           <button
             onClick={() => { setFiltrosAbiertos(v => !v); setDropdownAbierto(false); }}
-            style={{ position: "relative", padding: "7px 14px", borderRadius: 20, border: "1px solid #bbb", fontSize: 13, outline: "none", cursor: "pointer", background: "#fff", color: "#333", display: "flex", alignItems: "center", gap: 8 }}
+            style={{ position: "relative", padding: "7px 14px", borderRadius: 20, border: "1px solid #e2e8f0", fontSize: 13, outline: "none", cursor: "pointer", background: "#fff", color: "#1e293b", display: "flex", alignItems: "center", gap: 8 }}
           >
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#e05a7a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
@@ -796,7 +817,7 @@ const Vender = () => {
         {/* Carrito */}
         <button
           onClick={() => setCarritoAbierto(true)}
-          style={{ position: "relative", background: "#666", border: "1px solid #bbb", color: "#fff", borderRadius: 20, padding: "7px 18px", fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}
+          style={{ position: "relative", background: "linear-gradient(135deg, #c0392b, #e74c3c)", border: "1px solid #c0392b", color: "#fff", borderRadius: 20, padding: "7px 18px", fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap", fontWeight: 600 }}
         >
           Carrito
           {totalItems > 0 && (
@@ -808,7 +829,7 @@ const Vender = () => {
       </div>
 
       {/* ── Grid de productos ────────────────────────────────────── */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "14px 20px", background: "#e8e8e8" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "14px 20px", background: "#f1f5f9" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
           {productosFiltrados.map((p) => (
             <ProductoCard
@@ -893,7 +914,16 @@ const Vender = () => {
                 <div className="modal-nombre">{productoDetalle.nombre}</div>
                 <div style={{ fontSize: "0.82rem", color: "#94a3b8", marginTop: 2, marginBottom: 12 }}>{productoDetalle.modelo}</div>
                 {productoDetalle.descripcion && (
-                  <p style={{ fontSize: "0.84rem", color: "#475569", lineHeight: 1.7, margin: "0 0 16px" }}>{productoDetalle.descripcion}</p>
+                  <ul style={{ margin: "0 0 16px", paddingLeft: 20, display: "flex", flexDirection: "column", gap: 10, textAlign: "left" }}>
+                    {productoDetalle.descripcion
+                      .split(/(?=✅)|\.(?=\s)/)
+                      .map(s => s.replace(/✅/g, "").trim().replace(/\.$/, ""))
+                      .filter(Boolean)
+                      .map((item, i) => (
+                        <li key={i} style={{ fontSize: "0.84rem", color: "#475569", lineHeight: 1.6 }}>{item}.</li>
+                      ))
+                    }
+                  </ul>
                 )}
                 {Object.keys(productoDetalle.especificaciones).length > 0 && (
                   <div className="modal-specs-grid" style={{ marginBottom: 16 }}>

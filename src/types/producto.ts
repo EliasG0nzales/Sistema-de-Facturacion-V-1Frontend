@@ -11,6 +11,7 @@ export interface Producto {
   codigo: string;
   descripcion: string;
   destacado: boolean;
+  badge?: "oferta" | "nuevo" | "ultimas" | "";
   especificaciones: Record<string, string | number>;
   imagenPrincipal?: string;
   imagenesSecundarias?: string[];
