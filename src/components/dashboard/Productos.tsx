@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Flame, Sparkles, Star, Zap } from "lucide-react";
 import type { Producto } from "../../types/producto";
 import { CATEGORIAS } from "../../data/productos";
 import { useProductos } from "../../context/ProductosContext";
@@ -121,11 +122,12 @@ const Productos = () => {
             </svg>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: "auto" }}>
               <span style={{ fontSize: "0.75rem", color: "#c0392b", fontWeight: 600 }}>Etiqueta:</span>
+              {form.badge === "oferta" ? <Flame size={16} color="#c0392b" aria-hidden="true" /> : form.badge === "nuevo" ? <Sparkles size={16} color="#c0392b" aria-hidden="true" /> : form.badge === "ultimas" ? <Zap size={16} color="#c0392b" aria-hidden="true" /> : null}
               <select name="badge" value={form.badge} onChange={handleChange} className="prod-input" style={{ width: "auto", padding: "4px 10px", fontSize: "0.78rem" }}>
                 <option value="">Sin etiqueta</option>
-                <option value="oferta">🔥 Oferta</option>
-                <option value="nuevo">🆕 Nuevo</option>
-                <option value="ultimas">⚡ Últimas unidades</option>
+                <option value="oferta">Oferta</option>
+                <option value="nuevo">Nuevo</option>
+                <option value="ultimas">Últimas unidades</option>
               </select>
             </div>
           </div>
@@ -204,7 +206,7 @@ const Productos = () => {
                   return (
                     <tr key={p.id}>
                       <td style={{ color: "#64748b", fontFamily: "monospace" }}>{p.codigo}</td>
-                      <td style={{ fontWeight: 600 }}>{p.nombre}{p.destacado && <span style={{ marginLeft: 6, color: "#f59e0b", fontSize: "0.7rem" }}>★</span>}</td>
+                      <td style={{ fontWeight: 600 }}>{p.nombre}{p.destacado && <Star size={12} fill="#f59e0b" color="#f59e0b" style={{ marginLeft: 6, verticalAlign: "-2px" }} aria-hidden="true" />}</td>
                       <td>{p.marca}</td><td>{p.modelo}</td><td>{p.categoria}</td>
                       <td>S/ {p.precio.toFixed(2)}</td><td>{p.stock}</td>
                       <td><span className={`stock-badge stock-${estado}`}>{estado === "ok" ? "En stock" : estado === "low" ? "Stock bajo" : "Sin stock"}</span></td>

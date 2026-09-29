@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Star } from "lucide-react";
 import { useProductos } from "../../context/ProductosContext";
 import { CATEGORIAS } from "../../data/productos";
 import type { Producto } from "../../types/producto";
@@ -459,7 +460,7 @@ const AdminPanel = ({ onVolverTienda }: { onVolverTienda?: () => void }) => {
                   ))}
                   <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#475569", cursor: "pointer", textAlign: "left" }}>
                     <input type="checkbox" name="destacado" checked={formProd.destacado} onChange={handleProdChange} />
-                    Marcar como destacado ★
+                    Marcar como destacado <Star size={14} fill="#f59e0b" color="#f59e0b" aria-hidden="true" />
                   </label>
                   <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
                     <button type="submit" style={{ ...btnPrimary, flex: 1 }}>
@@ -516,7 +517,7 @@ const AdminPanel = ({ onVolverTienda }: { onVolverTienda?: () => void }) => {
                           </td>
                           <td style={{ padding: "8px 12px", color: "#64748b", fontFamily: "monospace" }}>{p.codigo}</td>
                           <td style={{ padding: "8px 12px", fontWeight: 600 }}>
-                            {p.nombre}{p.destacado && <span style={{ marginLeft: 5, color: "#f59e0b" }}>★</span>}
+                            {p.nombre}{p.destacado && <Star size={12} fill="#f59e0b" color="#f59e0b" style={{ marginLeft: 5, verticalAlign: "-2px" }} aria-hidden="true" />}
                           </td>
                           <td style={{ padding: "8px 12px", color: "#64748b" }}>{p.categoria}</td>
                           <td style={{ padding: "8px 12px" }}>S/ {p.precio.toFixed(2)}</td>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { CheckCircle2, KeyRound, Mail, Search, Send, ShieldCheck, Smartphone } from "lucide-react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -190,7 +191,7 @@ const ForgotPassword = () => {
         {/* PASO 1 — Encontrar cuenta */}
         {step === "find" && (
           <>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
+            <div style={{ marginBottom: 12 }}><Search size={40} aria-hidden="true" /></div>
             <h2 style={{ fontSize: 26, fontWeight: 700, marginBottom: 8 }}>
               Encuentra tu cuenta
             </h2>
@@ -219,7 +220,7 @@ const ForgotPassword = () => {
         {/* PASO 2 — Elegir método */}
         {step === "method" && (
           <>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>🔐</div>
+            <div style={{ marginBottom: 12 }}><ShieldCheck size={40} aria-hidden="true" /></div>
             <h2 style={{ fontSize: 26, fontWeight: 700, marginBottom: 8 }}>
               Verificación de seguridad
             </h2>
@@ -242,7 +243,7 @@ const ForgotPassword = () => {
                   textAlign: "left", display: "flex", alignItems: "center", gap: 12,
                 }}
               >
-                <span style={{ fontSize: 24 }}>📧</span>
+                <Mail size={24} aria-hidden="true" />
                 <div>
                   <p style={{ margin: 0, fontWeight: 600 }}>Correo electrónico</p>
                   <p style={{ margin: 0, fontSize: 12, opacity: 0.7 }}>{foundUser?.email}</p>
@@ -259,7 +260,7 @@ const ForgotPassword = () => {
                   textAlign: "left", display: "flex", alignItems: "center", gap: 12,
                 }}
               >
-                <span style={{ fontSize: 24 }}>📱</span>
+                <Smartphone size={24} aria-hidden="true" />
                 <div>
                   <p style={{ margin: 0, fontWeight: 600 }}>Número de celular</p>
                   <p style={{ margin: 0, fontSize: 12, opacity: 0.7 }}>
@@ -283,7 +284,7 @@ const ForgotPassword = () => {
         {/* PASO 3 — Ingresar código */}
         {step === "verify" && (
           <>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>📨</div>
+            <div style={{ marginBottom: 12 }}><Send size={40} aria-hidden="true" /></div>
             <h2 style={{ fontSize: 26, fontWeight: 700, marginBottom: 8 }}>
               Ingresa el código
             </h2>
@@ -326,7 +327,7 @@ const ForgotPassword = () => {
         {/* PASO 4 — Nueva contraseña */}
         {step === "newPassword" && (
           <>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>🔑</div>
+            <div style={{ marginBottom: 12 }}><KeyRound size={40} aria-hidden="true" /></div>
             <h2 style={{ fontSize: 26, fontWeight: 700, marginBottom: 8 }}>
               Nueva contraseña
             </h2>
@@ -398,7 +399,7 @@ const ForgotPassword = () => {
         {/* PASO 5 — Éxito */}
         {step === "done" && (
           <>
-            <div style={{ fontSize: 56, marginBottom: 16 }}>✅</div>
+            <div style={{ marginBottom: 16 }}><CheckCircle2 size={56} aria-hidden="true" /></div>
             <h2 style={{ fontSize: 26, fontWeight: 700, marginBottom: 12 }}>
               ¡Contraseña actualizada!
             </h2>

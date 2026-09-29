@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Package } from "lucide-react";
 import type { ReactElement } from "react";
 import type { Producto } from "../../types/producto";
 import type { ItemCarrito } from "../../types/carrito";
@@ -870,7 +871,7 @@ const Vender = () => {
                   <div className="modal-left">
                     <div className="modal-img-main">
                       {totalImagenes === 0 ? (
-                        <span style={{ fontSize: "3rem" }}>📦</span>
+                        <Package size={48} strokeWidth={1.5} aria-hidden="true" />
                       ) : (
                         <>
                           <img src={imagenes[imagenActual]} alt={productoDetalle.nombre} />

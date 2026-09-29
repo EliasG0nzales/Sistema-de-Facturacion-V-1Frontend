@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import React from "react";
+import { Flame, LockKeyhole, MessageCircle, Package, Search, ShieldCheck, ShoppingCart, Sparkles, Star, Truck, UserRound, X, Zap } from "lucide-react";
 import type { Producto } from "../../types/producto";
 import { useProductos } from "../../context/ProductosContext";
 import { useAuth } from "../../context/AuthContext";
@@ -142,17 +143,16 @@ const CAT_SVG: Record<string, React.ReactElement> = {
   ),
 };
 
-const BADGES: { label: string; color: string; bg: string; check: (p: Producto) => boolean }[] = [
-  { label: "🔥 Oferta",        color: "#fff", bg: "#c0392b", check: (p) => p.badge === "oferta" || p.precio < 200 },
-  { label: "⭐ Destacado",     color: "#fff", bg: "#b7791f", check: (p) => p.destacado },
-  { label: "⚡ Últimas uds.",  color: "#fff", bg: "#6b21a8", check: (p) => p.badge === "ultimas" || (p.stock > 0 && p.stock <= p.stockMinimo) },
-  { label: "🆕 Nuevo",         color: "#fff", bg: "#065f46", check: (p) => p.badge === "nuevo" || p.id > Date.now() - 86400000 * 3 },
+const BADGES: { label: string; icon: React.ReactNode; color: string; bg: string; check: (p: Producto) => boolean }[] = [
+  { label: "Oferta", icon: <Flame size={12} aria-hidden="true" />, color: "#fff", bg: "#c0392b", check: (p) => p.badge === "oferta" || p.precio < 200 },
+  { label: "Destacado", icon: <Star size={12} aria-hidden="true" />, color: "#fff", bg: "#b7791f", check: (p) => p.destacado },
+  { label: "Últimas uds.", icon: <Zap size={12} aria-hidden="true" />, color: "#fff", bg: "#6b21a8", check: (p) => p.badge === "ultimas" || (p.stock > 0 && p.stock <= p.stockMinimo) },
+  { label: "Nuevo", icon: <Sparkles size={12} aria-hidden="true" />, color: "#fff", bg: "#065f46", check: (p) => p.badge === "nuevo" || p.id > Date.now() - 86400000 * 3 },
 ];
 
 const StarRating = ({ rating = 4 }: { rating?: number }) => (
-  <span style={{ fontSize: 11, color: "#f59e0b", letterSpacing: 1 }}>
-    {"★".repeat(rating)}{"☆".repeat(5 - rating)}
-    <span style={{ color: "#666", marginLeft: 4, fontSize: 10 }}>({Math.floor(Math.random() * 80) + 5})</span>
+  <span style={{ display: "inline-flex", alignItems: "center", gap: 1, color: "#f59e0b" }}>
+    {Array.from({ length: 5 }, (_, index) => <Star key={index} size={11} fill={index < rating ? "#f59e0b" : "none"} aria-hidden="true" />)}
   </span>
 );
 
@@ -173,7 +173,7 @@ const TiendaCard = ({ producto, onAgregar, onVerDetalle }: {
       {/* Badge */}
       {badge && (
         <span className="tienda-badge" style={{ background: badge.bg, color: badge.color }}>
-          {badge.label}
+          {badge.icon}{badge.label}
         </span>
       )}
 
@@ -204,7 +204,7 @@ const TiendaCard = ({ producto, onAgregar, onVerDetalle }: {
           <span className="tienda-card-stock">{producto.stock} disp.</span>
         </div>
         <button className="tienda-add-btn" onClick={onAgregar} disabled={producto.stock === 0}>
-          {producto.stock === 0 ? "Sin stock" : "🛒 Agregar"}
+          {producto.stock === 0 ? "Sin stock" : <><ShoppingCart size={14} aria-hidden="true" /> Agregar</>}
         </button>
       </div>
     </div>
@@ -308,6 +308,7 @@ const Tienda = ({ onLogout }: { onLogout?: () => void }) => {
           position: absolute; top: 8px; left: 8px;
           font-size: 10px; font-weight: 700;
           padding: 3px 8px; border-radius: 10px; z-index: 2;
+          display: flex; align-items: center; gap: 4px;
         }
         .tienda-card-img {
           width: 100%; aspect-ratio: 1/1;
@@ -473,8 +474,14 @@ const Tienda = ({ onLogout }: { onLogout?: () => void }) => {
       <div style={{ background: "linear-gradient(90deg, #c0392b, #e74c3c, #c0392b)", padding: "6px 0", overflow: "hidden" }}>
         <div className="tienda-banner-track">
           {[...Array(2)].map((_, rep) => (
-            ["🚚 Envíos a todo el país", "🛡 Garantía 12 meses", "💬 Soporte técnico gratis", "⚡ Entrega rápida", "🔒 Compra segura"].map((item, i) => (
-              <span key={`${rep}-${i}`} className="tienda-banner-item">{item}</span>
+            [
+              { label: "Envíos a todo el país", icon: <Truck size={14} aria-hidden="true" /> },
+              { label: "Garantía 12 meses", icon: <ShieldCheck size={14} aria-hidden="true" /> },
+              { label: "Soporte técnico gratis", icon: <MessageCircle size={14} aria-hidden="true" /> },
+              { label: "Entrega rápida", icon: <Zap size={14} aria-hidden="true" /> },
+              { label: "Compra segura", icon: <LockKeyhole size={14} aria-hidden="true" /> },
+            ].map((item, i) => (
+              <span key={`${rep}-${i}`} className="tienda-banner-item">{item.icon}{item.label}</span>
             ))
           ))}
         </div>
@@ -492,18 +499,22 @@ const Tienda = ({ onLogout }: { onLogout?: () => void }) => {
         </div>
 
         {/* Buscador */}
-        <input
-          className="tienda-search"
-          placeholder="🔍  Buscar productos, marcas..."
-          value={busqueda}
-          onChange={e => setBusqueda(e.target.value)}
-        />
+        <div style={{ flex: 1, minWidth: 0, position: "relative" }}>
+          <Search size={16} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} aria-hidden="true" />
+          <input
+            className="tienda-search"
+            style={{ width: "100%", boxSizing: "border-box", paddingLeft: 36 }}
+            placeholder="Buscar productos, marcas..."
+            value={busqueda}
+            onChange={e => setBusqueda(e.target.value)}
+          />
+        </div>
 
         {/* Nav links */}
         <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
           {(["todos", "destacados", "ofertas"] as const).map(s => (
             <button key={s} className={`tienda-nav-link${seccionDestacada === s ? " active" : ""}`} onClick={() => setSeccionDestacada(s)}>
-              {s === "todos" ? "Inicio" : s === "destacados" ? "⭐ Destacados" : "🔥 Ofertas"}
+              {s === "todos" ? "Inicio" : s === "destacados" ? <><Star size={14} aria-hidden="true" /> Destacados</> : <><Flame size={14} aria-hidden="true" /> Ofertas</>}
             </button>
           ))}
         </div>
@@ -513,7 +524,7 @@ const Tienda = ({ onLogout }: { onLogout?: () => void }) => {
           onClick={() => setCarritoAbierto(true)}
           style={{ position: "relative", background: "linear-gradient(135deg,#c0392b,#e74c3c)", border: "none", color: "#fff", borderRadius: 20, padding: "7px 18px", fontSize: 13, cursor: "pointer", fontWeight: 700, flexShrink: 0, display: "flex", alignItems: "center", gap: 6 }}
         >
-          🛒 Carrito
+          <ShoppingCart size={15} aria-hidden="true" /> Carrito
           {totalItems > 0 && (
             <span style={{ position: "absolute", top: -6, right: -6, background: "#fff", color: "#c0392b", borderRadius: "50%", width: 18, height: 18, fontSize: 10, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>
               {totalItems}
@@ -523,7 +534,7 @@ const Tienda = ({ onLogout }: { onLogout?: () => void }) => {
 
         {/* Usuario + acciones */}
         <div style={{ flexShrink: 0, textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-          <div style={{ fontSize: 12, color: "#1e293b", fontWeight: 700 }}>Hola, {user?.username || "Usuario"} 👋</div>
+          <div style={{ fontSize: 12, color: "#1e293b", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}><UserRound size={14} aria-hidden="true" /> Hola, {user?.username || "Usuario"}</div>
           <div style={{ display: "flex", gap: 6 }}>
             {onLogout && (
               <button onClick={onLogout} style={{ fontSize: 10, padding: "3px 10px", borderRadius: 10, border: "1px solid #e2e8f0", background: "transparent", color: "#475569", cursor: "pointer" }}>
@@ -546,7 +557,7 @@ const Tienda = ({ onLogout }: { onLogout?: () => void }) => {
               className={`tienda-cat-btn${categoriaActiva === c ? " active" : ""}`}
               onClick={() => setCategoriaActiva(c)}
             >
-              {c === "todas" ? "📦 Todos" : c}
+              {c === "todas" ? <><Package size={14} aria-hidden="true" /> Todos</> : c}
             </button>
           ))}
         </aside>
@@ -558,7 +569,7 @@ const Tienda = ({ onLogout }: { onLogout?: () => void }) => {
             <div style={{ display: "flex", gap: 8 }}>
               {(["todos", "destacados", "ofertas"] as const).map(s => (
                 <button key={s} className={`seccion-btn${seccionDestacada === s ? " active" : ""}`} onClick={() => setSeccionDestacada(s)}>
-                  {s === "todos" ? "Todos" : s === "destacados" ? "⭐ Destacados" : "🔥 Ofertas"}
+                  {s === "todos" ? "Todos" : s === "destacados" ? <><Star size={14} aria-hidden="true" /> Destacados</> : <><Flame size={14} aria-hidden="true" /> Ofertas</>}
                 </button>
               ))}
             </div>
@@ -567,7 +578,7 @@ const Tienda = ({ onLogout }: { onLogout?: () => void }) => {
 
           {productosFiltrados.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 0", color: "#555" }}>
-              <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
+              <div style={{ marginBottom: 12 }}><Search size={40} aria-hidden="true" /></div>
               <div style={{ fontSize: 14 }}>No se encontraron productos</div>
             </div>
           ) : (
@@ -595,8 +606,8 @@ const Tienda = ({ onLogout }: { onLogout?: () => void }) => {
           }}>
             {/* Header carrito */}
             <div style={{ padding: "14px 16px", borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fff" }}>
-              <span style={{ fontWeight: 800, fontSize: 15, color: "#1e293b" }}>🛒 Carrito ({totalItems})</span>
-              <button onClick={() => setCarritoAbierto(false)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#94a3b8" }}>✕</button>
+              <span style={{ fontWeight: 800, fontSize: 15, color: "#1e293b", display: "flex", alignItems: "center", gap: 6 }}><ShoppingCart size={17} aria-hidden="true" /> Carrito ({totalItems})</span>
+              <button onClick={() => setCarritoAbierto(false)} aria-label="Cerrar carrito" style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8", display: "flex" }}><X size={18} aria-hidden="true" /></button>
             </div>
 
             {/* Items */}
@@ -738,7 +749,7 @@ const Tienda = ({ onLogout }: { onLogout?: () => void }) => {
               </div>
               <div className="tienda-modal-footer">
                 <button className="tienda-btn-agregar" onClick={() => { agregarAlCarrito(productoDetalle); setProductoDetalle(null); setImagenActual(0); }} disabled={productoDetalle.stock === 0}>
-                  🛒 Agregar al Carrito
+                  <ShoppingCart size={15} aria-hidden="true" /> Agregar al Carrito
                 </button>
                 <button className="tienda-btn-cerrar" onClick={() => { setProductoDetalle(null); setImagenActual(0); }}>Cerrar</button>
               </div>
